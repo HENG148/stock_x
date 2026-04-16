@@ -6,10 +6,12 @@ export default defineConfig({
   out: './src/drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: '123456',
-    database: 'stock_x'
+    // host: process.env.DB_HOST!,
+    // port: 5432,
+    // user: process.env.DB_USER!,
+    // password: process.env.DB_PASSWORD!,
+    // database: process.env.DB_NAME!,
+    // ssl: false
+    url: process.env.DATABASE_URL!,
   },
 });
