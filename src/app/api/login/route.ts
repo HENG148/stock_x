@@ -2,12 +2,11 @@ import { db } from "@/src/db";
 import { users } from "@/src/db/schema";
 import bcrypt from "bcryptjs";
 import { sql } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
-  if (!email || password) {
+  if (!email || !password) {
     return NextResponse.json(
       { message: "Email and password are required" },
       {status: 400}

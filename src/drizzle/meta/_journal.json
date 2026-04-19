@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1776366371287,
-      "tag": "0000_acoustic_phil_sheldon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1776371287942,
-      "tag": "0001_little_stephen_strange",
+      "when": 1776594795515,
+      "tag": "0000_wise_shotgun",
       "breakpoints": true
     }
   ]

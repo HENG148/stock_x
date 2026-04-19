@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 import Providers from "./providers";
-import { cn } from "@/lib/utils";
+import { cn } from "@/src/lib/utils";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 

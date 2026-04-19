@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "dotenv -e .env.local drizzle-kit generate",
+    "db:migrate": "dotenv -e .env.local drizzle-kit migrate",
+    "db:studio": "dotenv -e .env.local drizzle-kit studio",
+    "db:push": "dotenv -e .env.local drizzle-kit push",
+    "generate-hash": "node -e \"const b = require('bcryptjs'); b.hash(process.argv[1], 10).then(h => console.log(h))\" --"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",
@@ -37,6 +39,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",

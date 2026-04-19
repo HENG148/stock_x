@@ -16,41 +16,54 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-
-    if (res.status === 404) {
-      router.push("/register");
-      return;
-    }
-
-    if (!res.ok) {
-      setError(data.message || "Something went wrong");
-      setLoading(false);
-      return;
-    }
-
     const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
     })
+
     if (result?.error) {
       setError("Invalid email or password");
-      setLoading(false);
+      setLoading(false)
       return;
     }
 
+    // const res = await fetch("/api/login", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json"
+    //   },
+    //   body: JSON.stringify({ email, password }),
+    // });
+    // const data = await res.json();
+
+    // if (res.status === 404) {
+    //   router.push("/register");
+    //   return;
+    // }
+
+    // if (!res.ok) {
+    //   setError(data.message || "Something went wrong");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    // const result = await signIn("credentials", {
+    //   email,
+    //   password,
+    //   redirect: false,
+    // })
+    // if (result?.error) {
+    //   setError("Invalid email or password");
+    //   setLoading(false);
+    //   return;
+    // }
+
     router.push("/");
+    router.refresh();
   }
 
-   return (
+  return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
@@ -79,7 +92,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="••••••••"
+              placeholder="Enter your passwords"
               required
             />
           </div>
