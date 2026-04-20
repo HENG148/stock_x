@@ -25,7 +25,7 @@ export async function Navbar() {
             <NavLink href="/news">News</NavLink>
             <NavLink href="/about">About</NavLink>
             <NavLink href="/help">Help</NavLink>
-            <NavLink href="/sell">Sell</NavLink>
+            {/* <NavLink href="/sell">Sell</NavLink> */}
 
             {user ? (
               <>

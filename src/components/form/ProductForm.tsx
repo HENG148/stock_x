@@ -43,8 +43,6 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
 
   return (
     <form action={action} className="space-y-6">
-
-      {/* ── Basic Info ────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Basic Info</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -59,6 +57,32 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
             />
           </div>
           <div>
+            <label htmlFor="brand" className="block text-xs font-semibold text-gray-500 mb-1.5">Brand</label>
+            <select
+              id="brand"
+              name="brand"
+              defaultValue={defaultValues.brand ?? ""}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors bg-white"
+            >
+              <option value="">Select brand...</option>
+              <option value="Nike">Nike</option>
+              <option value="Adidas">Adidas</option>
+              <option value="Puma">Puma</option>
+              <option value="New Balance">New Balance</option>
+              <option value="Converse">Converse</option>
+              <option value="Vans">Vans</option>
+              <option value="Reebok">Reebok</option>
+              <option value="Jordan">Jordan</option>
+              <option value="Yeezy">Yeezy</option>
+              <option value="Asics">Asics</option>
+              <option value="Under Armour">Under Armour</option>
+              <option value="Balenciaga">Balenciaga</option>
+              <option value="Off-White">Off-White</option>
+              <option value="Supreme">Supreme</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          {/* <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">Brand</label>
             <input
               name="brand"
@@ -66,7 +90,7 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
               placeholder="Nike, Adidas..."
               className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
             />
-          </div>
+          </div> */}
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">SKU</label>
             <input
