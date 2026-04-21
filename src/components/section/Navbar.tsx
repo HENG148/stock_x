@@ -25,7 +25,6 @@ export async function Navbar() {
             <NavLink href="/news">News</NavLink>
             <NavLink href="/about">About</NavLink>
             <NavLink href="/help">Help</NavLink>
-            {/* <NavLink href="/sell">Sell</NavLink> */}
 
             {user ? (
               <>
@@ -41,7 +40,7 @@ export async function Navbar() {
                   Login
                 </Link>
                 <Link
-                  href="/login"
+                  href="/register"
                   className="px-4 py-1.5 rounded-full bg-gray-900 text-[13px] font-semibold text-white no-underline hover:bg-gray-700 transition-colors"
                 >
                   Sign up

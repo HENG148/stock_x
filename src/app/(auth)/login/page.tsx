@@ -28,37 +28,6 @@ export default function LoginPage() {
       return;
     }
 
-    // const res = await fetch("/api/login", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   },
-    //   body: JSON.stringify({ email, password }),
-    // });
-    // const data = await res.json();
-
-    // if (res.status === 404) {
-    //   router.push("/register");
-    //   return;
-    // }
-
-    // if (!res.ok) {
-    //   setError(data.message || "Something went wrong");
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // const result = await signIn("credentials", {
-    //   email,
-    //   password,
-    //   redirect: false,
-    // })
-    // if (result?.error) {
-    //   setError("Invalid email or password");
-    //   setLoading(false);
-    //   return;
-    // }
-
     router.push("/");
     router.refresh();
   }

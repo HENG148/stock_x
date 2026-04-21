@@ -30,7 +30,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // router.push("/login");
     router.push("/");
   };
 
@@ -75,7 +74,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="••••••••"
+              placeholder="Enter your password"
               required
             />
           </div>

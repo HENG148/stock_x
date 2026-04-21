@@ -1,12 +1,8 @@
-import { auth, signOut } from "@/src/auth";
+import { auth } from "@/src/auth";
+import { handleSignOut } from "@/src/components/action/auth";
 import { NAV_ITEMS } from "@/src/types/type";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
-async function handleSignOut() {
-  "use server";
-  await signOut({ redirectTo: "/" });
-}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
