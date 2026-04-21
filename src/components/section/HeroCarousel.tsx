@@ -11,11 +11,11 @@ type Slide = {
   subtitle: string;
   cta: string;
   href: string;
-  bg: string;           // background color
-  textColor: string;    // title color
-  image: string;        // right-side shoe image
-  imageLeft?: string;   // optional left-side partial image
-  sideLabel?: string;   // vertical side text
+  bg: string;  
+  textColor: string;
+  image: string;       
+  imageLeft?: string;  
+  sideLabel?: string; 
 };
 
 const SLIDES: Slide[] = [
@@ -27,7 +27,7 @@ const SLIDES: Slide[] = [
     href: "/sneakers",
     bg: "#0a3728",
     textColor: "#ffffff",
-    image: "https://images.stockx.com/images/Air-Jordan-11-Retro-Low-University-Blue-Product.jpg",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/bltde8eeadd6bf5f2a2/69d3c38a02aea82c50638ca1/Spring_New_Arrivals-Banners-ENPrimary_Desktop-Small.jpg?auto=webp&format=pjpg&width=1246&dpr=1&quality=80 1x, https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/bltde8eeadd6bf5f2a2/69d3c38a02aea82c50638ca1/Spring_New_Arrivals-Banners-ENPrimary_Desktop-Small.jpg?auto=webp&format=pjpg&width=1246&dpr=2&quality=75 2x, https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/bltde8eeadd6bf5f2a2/69d3c38a02aea82c50638ca1/Spring_New_Arrivals-Banners-ENPrimary_Desktop-Small.jpg?auto=webp&format=pjpg&width=1246&dpr=3&quality=50 3x",
     sideLabel: "Jordan",
   },
   {
@@ -38,7 +38,7 @@ const SLIDES: Slide[] = [
     href: "/sneakers",
     bg: "#111111",
     textColor: "#ffffff",
-    image: "https://images.stockx.com/images/Nike-Dunk-Low-Retro-White-Black-Panda-Product.jpg",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/blt3489cb8549d4c8aa/696935d6c113250008ad02bd/NikeMind001Slides_PrimaryDesktop-Half.jpg?auto=webp&format=pjpg&quality=75&dpr=2&width=1246",
     sideLabel: "Nike",
   },
   {
@@ -49,21 +49,20 @@ const SLIDES: Slide[] = [
     href: "/sneakers",
     bg: "#1a1a2e",
     textColor: "#ffffff",
-    image: "https://images.stockx.com/images/Adidas-Yeezy-Boost-350-V2-Zebra-Product.jpg",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/blt37fd4e44461d2c03/69e25f813d1e363eb59cd6eb/AJ11_Low_University_Blue-Banners-ENPrimary_Desktop-Small.jpg?auto=webp&format=pjpg&quality=75&dpr=2&width=1246",
     sideLabel: "Adidas",
   },
-  
-  {
-    id: 4,
-    title: "RETRO\nREBORN",
-    subtitle: "Jordan 5 Retro Wolf Grey",
-    cta: "Shop Now",
-    href: "/sneakers",
-    bg: "#2d2d2d",
-    textColor: "#ffffff",
-    image: "https://images.stockx.com/images/Air-Jordan-5-Retro-Wolf-Grey-2024-Product.jpg",
-    sideLabel: "Jordan",
-  },
+  // {
+  //   id: 4,
+  //   title: "RETRO\nREBORN",
+  //   subtitle: "Jordan 5 Retro Wolf Grey",
+  //   cta: "Shop Now",
+  //   href: "/sneakers",
+  //   bg: "#2d2d2d",
+  //   textColor: "#ffffff",
+  //   image: "https://images.stockx.com/images/Air-Jordan-5-Retro-Wolf-Grey-2024-Product.jpg",
+  //   sideLabel: "Jordan",
+  // },
 ];
 
 const AUTOPLAY_DELAY = 5000;

@@ -66,7 +66,6 @@ export default async function AdminPage() {
         ))}
       </div>
 
-      {/* Revenue */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <p className="text-sm font-medium text-gray-500 mb-1">Total Revenue</p>
         <p className="text-3xl font-bold text-gray-900">

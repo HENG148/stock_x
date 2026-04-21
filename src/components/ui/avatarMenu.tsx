@@ -1,13 +1,10 @@
-import { signOut } from "@/src/auth";
+"use client"
+
 import { DropdownLink } from "../DropdownLink";
+import { handleSignOut } from "../action/auth";
 
 function getInitial(name: string | null | undefined): string {
   return name?.[0]?.toUpperCase() ?? "U";
-}
-
-async function handleSignOut() {
-  "use server";
-  await signOut({ redirectTo: "/"})
 }
 
 export function AvatarMenu({

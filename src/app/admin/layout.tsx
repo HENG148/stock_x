@@ -16,9 +16,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex min-h-screen bg-[#f5f5f0]">
-      <aside className="w-56 shrink-0 bg-[#111] min-h-screen flex flex-col">
+      <aside className="w-56 shrink-0 bg-[#111] h-screen sticky top-0 flex flex-col overflow-hidden">
         <div className="px-5 py-5 border-b border-white/10">
-          <Link href="/" className="text-white font-black text-lg tracking-tight no-underline">
+          <Link href="/admin" className="text-white font-black text-lg tracking-tight no-underline">
             StockX
           </Link>
           <p className="text-white/30 text-[11px] font-medium mt-0.5 uppercase tracking-widest">
@@ -60,7 +60,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto">
         {children}
       </main>
     </div>
