@@ -1,77 +1,35 @@
-import { auth } from "@/src/auth";
 import ExpandableDescription from "@/src/components/EnableDescription";
+import ProductGallery from "@/src/components/ProductGallery";
 import { Breadcrumb } from "@/src/components/ui/Breadcrump";
 import { db } from "@/src/db";
-import { orders, products } from "@/src/db/schema";
+import { products } from "@/src/db/schema";
 import { SIZES } from "@/src/types/type";
-import { count, eq } from "drizzle-orm";
-import Image from "next/image";
+import { eq, or } from "drizzle-orm";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const session = await auth();
+export default async function ProductDetail({ params }: { params: Promise<{ category: string; slug: string }> }) {
+  const { category, slug } = await params;
 
   const product = await db
     .select()
     .from(products)
-    .where(eq(products.id, id))
+    .where(or(
+      eq(products.slug, slug),
+    ))
     .then((r) => r[0]);
   if (!product) notFound();
 
-  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-  const recentSales = await db
-    .select({ count: count() })
-    .from(orders)
-    .where(eq(orders.userId, id))
-    .then((r) => r[0]?.count ?? 0);
+  if (product.category?.toLowerCase() !== category.toLowerCase()) {
+    redirect(`/${product.category?.toLowerCase()}/${slug}`);
+  }
   
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-300 mx-auto px-6 py-6">
-        {/* <Breadcrumb /> */}
+        <Breadcrumb />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-2">
-          <div>
-            <div className="relative  rounded-2xl overflow-hidden aspect-square mb-4 border border-gray-100">
-              {product.imageUrl ? (
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  fill
-                  className="object-contain p-10"
-                  sizes="600px"
-                  priority
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-8xl">
-                  👟
-                </div>
-              )}
-            </div>
- 
-            <div className="flex gap-2">
-              <div className="w-20 h-20 rounded-xl border-2 border-gray-900 flex flex-col items-center justify-center gap-1 cursor-pointer">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.5">
-                  <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0" />
-                  <path d="M12 8v4l3 3" />
-                </svg>
-                <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wide">360°</span>
-              </div>
- 
-              {product.imageUrl && (
-                <div className="w-20 h-20 rounded-xl border border-gray-200 relative overflow-hidden">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-contain p-2"
-                    sizes="80px"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          <ProductGallery product={product} />
           
           <div>
             <div className="flex items-center justify-between mb-4">

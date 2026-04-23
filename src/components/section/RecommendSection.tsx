@@ -1,7 +1,7 @@
 import { auth } from "@/src/auth";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
-import { and, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, or, sql, InferSelectModel, notInArray } from "drizzle-orm";
 import { EmptyState } from "../EmptyState";
 import { ProductCard } from "../ProductCard";
 import Link from "next/link";
@@ -9,28 +9,75 @@ import Link from "next/link";
 export async function RecommendedSection() {
   const session = await auth();
   const userId = session?.user?.id;
+  let recommended: {
+    id: string;
+    name: string;
+    brand: string | null;
+    imageUrl: string | null;
+    lowestAsk: string | null;
+    slug: string | null;
+  }[] = [];
+  if (userId) {
+    const userWatchlist = await db
+      .select({ category: products.category })
+      .from(watchlist)
+      .innerJoin(products, eq(watchlist.productId, products.id))
+      .where(eq(watchlist.userId, userId));
+    const userCategories = [...new Set(userWatchlist.map((w) => w.category))];
 
-  const recommended = await db
-    .select({
-      id: products.id,
-      name: products.name,
-      brand: products.brand,
-      imageUrl: products.imageUrl,
-      lowestAsk: products.lowestAsk,
-    })
-    .from(products)
-    .where(
-      and(
-        eq(products.isFeatured, true),
-        or(
-          isNull(products.featuredUntil),
-          gt(products.featuredUntil, new Date())
+    if (userCategories.length > 0) {
+      const watchedProductIds = await db
+        .select({ productId: watchlist.productId })
+        .from(watchlist)
+        .where(eq(watchlist.userId, userId))
+        .then((r) => r.map((w) => w.productId));
+      
+      recommended = await db
+        .select({
+          id: products.id,
+          name: products.name,
+          brand: products.brand,
+          imageUrl: products.imageUrl,
+          lowestAsk: products.lowestAsk,
+          slug: products.slug
+        })
+        .from(products)
+        .where(
+          and(
+            // inArray(sql`${products.category}`, userCategories),
+            inArray(products.category, userCategories as string[]),
+            // isNull(watchlist.productId)
+            watchedProductIds.length > 0
+              ? notInArray(products.id, watchedProductIds as string[])
+              : undefined
+          )
+        )
+        .orderBy(desc(products.createdAt))
+        .limit(7);
+    }
+  }
+
+  if (recommended.length === 0) {
+    recommended = await db
+      .select({
+        id: products.id,
+        name: products.name,
+        brand: products.brand,
+        imageUrl: products.imageUrl,
+        lowestAsk: products.lowestAsk,
+        slug: products.slug
+      })
+      .from(products)
+      .where(
+        and(
+          eq(products.isFeatured, true),
+          or(isNull(products.featuredUntil), gt(products.featuredUntil, new Date()))
         )
       )
-    )
-    .orderBy(desc(products.createdAt)) // show the new insert at first
-    .limit(7);
-  
+      .orderBy(desc(products.createdAt))
+      .limit(7);
+  }
+
   const hasMore = recommended.length > 6;
   const displayList = recommended.slice(0, 6)
   
@@ -73,7 +120,7 @@ export async function RecommendedSection() {
               strokeLinecap="round"
               strokeLinejoin="round"
               className="group-hover:translate-x-0.5 transition-transform"
-            >
+              >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
@@ -97,3 +144,25 @@ export async function RecommendedSection() {
     </section>
   )
 }
+
+
+// const recommended = await db
+//   .select({
+//     id: products.id,
+//     name: products.name,
+//     brand: products.brand,
+//     imageUrl: products.imageUrl,
+//     lowestAsk: products.lowestAsk,
+//   })
+//   .from(products)
+//   .where(
+//     and(
+//       eq(products.isFeatured, true),
+//       or(
+//         isNull(products.featuredUntil),
+//         gt(products.featuredUntil, new Date())
+//       )
+//     )
+//   )
+//   .orderBy(desc(products.createdAt)) // show the new insert at first
+//   .limit(7);

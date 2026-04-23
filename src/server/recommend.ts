@@ -1,3 +1,5 @@
+'use server'
+
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { watchlist } from "../db/schema";
@@ -9,7 +11,6 @@ interface toggleWatchlistProps {
 }
 
 export async function toggleWatchlist({productId, userId, isWatched}: toggleWatchlistProps) {
-  "use server";
   if (isWatched) {
     await db
       .delete(watchlist)

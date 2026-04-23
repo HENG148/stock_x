@@ -3,6 +3,7 @@ import { Navbar } from "../../components/section/Navbar";
 import { RecommendedSection } from "../../components/section/RecommendSection";
 import { HeroCarousel } from "../../components/section/HeroCarousel";
 import { Carousel } from "../../components/section/Carousel";
+import TrendingSection from "@/src/components/section/Trending";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <div>
         <Carousel />
         <RecommendedSection />
+        <TrendingSection />
       </div>
     </>
   );

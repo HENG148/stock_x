@@ -2,7 +2,7 @@ import { auth } from "@/src/auth";
 import { ProductCard } from "@/src/components/ProductCard";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
-import { SLUG_MAP, SORT_OPTIONS } from "@/src/types/type";
+import { CATEGORIES, SLUG_MAP, SORT_OPTIONS, SUBCATEGORIES } from "@/src/types/type";
 import { desc, eq, inArray } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,12 +12,13 @@ export default async function BrowseSlugPage({
   searchParams,
 }: {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ sort?: string; brand?: string }>;
+    searchParams: Promise<{ sort?: string; brand?: string, section?: string }>;
 }) {
   const { slug } = await params;
   const sp = await searchParams;
   const sort = sp.sort ?? "newest";
   const brandFilter = sp.brand ?? "";
+  const section = sp.section ?? "" 
  
   const filter = SLUG_MAP[slug];
   if (!filter) notFound();
@@ -36,12 +37,13 @@ export default async function BrowseSlugPage({
       category: products.category,
       section: products.section,
       createdAt: products.createdAt,
+      slug: products.slug
     })
     .from(products)
     .where(
       filter.type === "category"
-        ? eq(products.category, filter.value!)
-        : eq(products.section, filter.value!)
+        ? eq(products.category, filter.value ?? "")
+        : eq(products.section, filter.value ?? "")
     )
     .orderBy(desc(products.createdAt));
  
@@ -51,6 +53,12 @@ export default async function BrowseSlugPage({
     allProducts = allProducts.filter(
       (p) => p.brand?.toLowerCase() === brandFilter.toLowerCase()
     );
+  }
+
+  if (section) {
+    allProducts = allProducts.filter(
+      (p)=>p.section?.toLowerCase()===section.toLowerCase()
+    )
   }
  
   if (sort === "lowest_ask") {
@@ -76,7 +84,22 @@ export default async function BrowseSlugPage({
       .where(inArray(watchlist.productId, ids));
     watchedIds = new Set(watched.map((w) => w.productId));
   }
- 
+
+  function buildSlugUrl(overrides: {
+    sort?: string; 
+    brand?: string;
+    section?: string
+  }) {
+    const merged = { sort, brand: brandFilter, section, ...overrides }
+    const query = new URLSearchParams();
+    if (merged.sort && merged.sort !== "newest") query.set("sort", merged.sort);
+    if (merged.brand) query.set("brand", merged.brand);
+    if (merged.section) query.set("section", merged.section);
+    const qs = query.toString();
+    return `/browse/${slug}${qs ? `?${qs}` : ""}`;
+  }
+
+  const subcategories = SUBCATEGORIES[slug.toLowerCase()];
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-360 mx-auto px-6 py-8">
@@ -115,6 +138,40 @@ export default async function BrowseSlugPage({
                 ))}
               </div>
             </div>
+
+            {subcategories && (
+              <div className="mb-6">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2">
+                  {filter.label}
+                </p> 
+                <div className="flex flex-col gap-0.5">
+                  {/* All option */}
+                  <Link
+                    href={buildSlugUrl({ section: "" })}
+                    className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
+                      !section
+                        ? "bg-gray-900 text-white font-semibold"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    All
+                  </Link>
+                  {subcategories.map((sub) => (
+                    <Link
+                      key={sub.slug}
+                      href={buildSlugUrl({ section: section === sub.slug ? "" : sub.slug })}
+                      className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
+                        section === sub.slug
+                          ? "bg-gray-900 text-white font-semibold"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
  
             <div>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">

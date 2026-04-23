@@ -37,8 +37,6 @@ export const accounts = pgTable("accounts", {
   sessionState: varchar("session_state", { length: 255 }),
 });
 
-// ─── Sessions (NextAuth) ──────────────────────────────────────────────────────
-
 export const sessions = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   sessionToken: varchar("session_token", { length: 255 }).notNull().unique(),
@@ -49,12 +47,10 @@ export const sessions = pgTable("sessions", {
 export const categories = pgTable("categories", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 100 }).notNull().unique(),
-  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  slug: varchar("slug", { length: 200 }).notNull().unique(),
   imageUrl: varchar("image_url", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
-// All your original columns kept + StockX marketplace fields added
 
 export const products = pgTable("products", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -75,6 +71,7 @@ export const products = pgTable("products", {
   isFeatured: boolean("is_featured").default(false),
   featuredUntil: timestamp("featured_until"),
   section: varchar("section", { length: 50 }).default("all"),
+  slug: varchar("slug", { length: 200 }).unique(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

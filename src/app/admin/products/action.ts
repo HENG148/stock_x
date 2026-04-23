@@ -2,8 +2,22 @@
 
 import { db } from "@/src/db";
 import { products } from "@/src/db/schema";
+import { generateSlug } from "@/src/lib/Slug";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+async function makeUniqueSlug(name: string, excludeId?: string): Promise<string> {
+  const base = generateSlug(name);
+  const existing = await db
+    .select({ id: products.id })
+    .from(products)
+    .where(eq(products.slug, base))
+    .then((r) => r[0]);
+
+  if (!existing) return base;
+  if (excludeId && existing.id === excludeId) return base;
+  return `${base}-${Math.random().toString(36).slice(2, 6)}`;
+}
 
 export async function createProduct(formData: FormData) {
   const name = formData.get("name") as string;
@@ -18,6 +32,7 @@ export async function createProduct(formData: FormData) {
   const category = formData.get("category") as string;
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
+  const slug = await makeUniqueSlug(name)
 
   const featuredUntil = isFeatured
     ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
@@ -25,6 +40,7 @@ export async function createProduct(formData: FormData) {
 
   await db.insert(products).values({
     name,
+    slug,
     brand: brand || null,
     sku: sku || null,
     description: description || null,
@@ -55,11 +71,13 @@ export async function updateProduct(id: string, formData: FormData) {
   const category = formData.get("category") as string;
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
+  const slug = await makeUniqueSlug(name, id)
  
   await db
     .update(products)
     .set({
       name,
+      slug,
       brand: brand || null,
       sku: sku || null,
       description: description || null,

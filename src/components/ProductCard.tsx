@@ -9,7 +9,8 @@ export type RecommendedProduct = {
   brand: string | null;
   imageUrl: string | null;
   lowestAsk: string | null;
-  slug?: string;
+  slug?: string | null;
+  category?: string | null;
 };
 
 export function ProductCard({
@@ -20,8 +21,10 @@ export function ProductCard({
   product: RecommendedProduct;
   isWatched: boolean;
   userId?: string;
-}) {
-  const href = `/products/${product.id}`;
+  }) {
+  const category = product.category?.toLowerCase() ?? "products";
+  // const href = `/${category}/${product.slug ?? product.id}`;
+  const href =`/product/${product.slug}`
   const price = product.lowestAsk
     ? `$${Number(product.lowestAsk).toLocaleString()}`
     : "-";

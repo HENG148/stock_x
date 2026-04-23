@@ -3,7 +3,7 @@ import { buildUrl } from "@/src/components/BuildUrl";
 import { ProductCard } from "@/src/components/ProductCard";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
-import { BRANDS, CATEGORIES, SORT_OPTIONS } from "@/src/types/type";
+import { BRANDS, CATEGORIES, SORT_OPTIONS, SUBCATEGORIES } from "@/src/types/type";
 import { desc, inArray } from "drizzle-orm";
 import Link from "next/link";
 
@@ -23,6 +23,7 @@ export default async function ProductPage({ searchParams }: {
   const sort = params.sort ?? "newest"
   const session = await auth();
   const userId = session?.user?.id;
+  const section = params.section ?? "";
 
   const allProducts = await db
     .select({
@@ -35,12 +36,13 @@ export default async function ProductPage({ searchParams }: {
       category: products.category,
       section: products.section,
       createdAt: products.createdAt,
+      slug: products.slug
     })
     .from(products)
     .orderBy(desc(products.createdAt));
   
   let filtered = allProducts;
-  if (query) {
+  if (brand) {
     filtered = filtered.filter(
       (p) => p.brand?.toLowerCase()===brand.toLowerCase()
     )
@@ -63,6 +65,12 @@ export default async function ProductPage({ searchParams }: {
     filtered = [...filtered].sort((a, b) => Number(a.price) - Number(b.price));
   } else if (sort === "price_desc") {
     filtered = [...filtered].sort((a, b) => Number(b.price) - Number(a.price));
+  }
+
+  if (section) {
+    filtered = filtered.filter(
+      (p) => p.section?.toLowerCase() === section.toLowerCase()
+    )
   }
 
   let watchedIds = new Set<string>();

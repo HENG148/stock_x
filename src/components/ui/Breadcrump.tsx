@@ -1,5 +1,6 @@
 'use client'
 
+import { NAV_LINKS } from "@/src/types/type";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useMemo } from "react";
@@ -10,9 +11,9 @@ interface BreadcrumbProps {
 
 function slugToLable(slug: string): string{
   return slug
-    .split("_")
+    .split(/[-_]/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join("");
+    .join(" ");
 }
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({ postTitle }) => {
@@ -20,10 +21,17 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ postTitle }) => {
   const breadcrumbs = useMemo(() => {
     if (!pathname) return [];
     const segments = pathname.split("/").filter(Boolean);
+
+    const browseCategories = NAV_LINKS
+      .map(link => link.href.replace("/browse/", "").replace("/browse", ""))
+      .filter(Boolean);
+
     let currentPath = "";
     return segments.map((seg, i) => {
       currentPath += `/${seg}`
-      const isLast = i === seg.length - 1;
+      const isLast = i === segments.length - 1;
+      const isBrowseCategory = browseCategories.includes(seg);
+      currentPath = isBrowseCategory ? `/browse/${seg}`:currentPath+ `${seg}`
       const label = isLast && postTitle ? postTitle : slugToLable((seg))
       return { path: currentPath, label, isLast };
     })

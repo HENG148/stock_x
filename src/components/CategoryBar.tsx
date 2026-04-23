@@ -1,11 +1,11 @@
-import { NAV_LINKs } from '../types/type'
+import { NAV_LINKS } from '../types/type'
 import Link from 'next/link'
 
 export default function CategoryBar() {
   return (
     <div className='bg-white'>
       <div className='max-w-360 mx-auto px-6 flex items-center overflow-x-auto scrollbar-hide'>
-        {NAV_LINKs.map((link) => 
+        {NAV_LINKS.map((link) => 
           link.accent ? (
             <Link
               key={link.href}

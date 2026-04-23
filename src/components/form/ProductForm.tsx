@@ -1,6 +1,8 @@
 "use client";
 
+import { SUBCATEGORIES } from "@/src/types/type";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type ProductFormProps = {
   action: (formData: FormData) => Promise<void>;
@@ -18,28 +20,32 @@ type ProductFormProps = {
     isFeatured?: boolean | null;
     featuredUntil?: Date | null;
     section?: string | null;
+    subcategory?: string | null;
     stock?: number | null;
   };
   submitLabel?: string;
 };
 
 const CATEGORIES = [
-  "Sneakers", "Apparel", "Accessories", "Collectibles", "Trading Cards", "Shoes"
+  "Sneakers", "Apparel", "Accessories", "Collectibles", "Trading Cards", "Shoes", "Men", "Women"
 ];
 
 const SECTIONS = [
-  { value: "all",      label: "All Products",           description: "General browse only, no promotion" },
+  { value: "all", label: "All Products", description: "General browse only, no promotion" },
   { value: "trending", label: "Trending — Recommended", description: "Shows in Recommended For You" },
-  { value: "new",      label: "New Arrivals",           description: "Shows in New Arrivals section" },
-  { value: "deals",    label: "Deals",                  description: "Shows in Deals section" },
+  { value: "new", label: "New Arrivals", description: "Shows in New Arrivals section" },
+  { value: "deals", label: "Deals", description: "Shows in Deals section" },
 ];
 
 export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Product" }: ProductFormProps) {
   const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState(defaultValues.category ?? "");
 
   const featuredUntilValue = defaultValues.featuredUntil
     ? new Date(defaultValues.featuredUntil).toISOString().slice(0, 16)
     : "";
+  
+  const subcategories = SUBCATEGORIES[selectedCategory.toLowerCase()] ?? [];
 
   return (
     <form action={action} className="space-y-6">
@@ -82,15 +88,6 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
               <option value="Other">Other</option>
             </select>
           </div>
-          {/* <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5">Brand</label>
-            <input
-              name="brand"
-              defaultValue={defaultValues.brand ?? ""}
-              placeholder="Nike, Adidas..."
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors"
-            />
-          </div> */}
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">SKU</label>
             <input
@@ -105,7 +102,9 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
             <select
               id="category"
               name="category"
-              defaultValue={defaultValues.category ?? ""}
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              // defaultValue={defaultValues.category ?? ""}
               className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors bg-white"
             >
               <option value="">Select category...</option>
@@ -114,6 +113,30 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
               ))}
             </select>
           </div>
+
+          <div>
+            <label htmlFor="subcategory" className="block text-xs font-semibold text-gray-500 mb-1.5">
+              Subcategory
+              {subcategories.length === 0 && (
+                <span className="text-gray-400 font-normal ml-1">(select a category first)</span>
+              )}
+            </label>
+            <select
+              id="subcategory"
+              name="subcategory"
+              defaultValue={defaultValues.subcategory ?? ""}
+              disabled={subcategories.length === 0}
+              className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-gray-900 transition-colors bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <option value="">Select subcategory</option>
+              {subcategories.map((sub) => (
+                <option key={sub.slug} value={sub.slug}>
+                  {sub.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">Stock</label>
             <input
@@ -138,15 +161,14 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
         </div>
       </div>
 
-      {/* ── Pricing ───────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Pricing</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { name: "price",         label: "Retail Price *", required: true,  placeholder: "180.00" },
-            { name: "lowestAsk",     label: "Lowest Ask",     required: false, placeholder: "362.00" },
-            { name: "highestBid",    label: "Highest Bid",    required: false, placeholder: "340.00" },
-            { name: "lastSalePrice", label: "Last Sale",      required: false, placeholder: "355.00" },
+            { name: "price", label: "Retail Price *", required: true,  placeholder: "180.00" },
+            { name: "lowestAsk", label: "Lowest Ask", required: false, placeholder: "362.00" },
+            { name: "highestBid", label: "Highest Bid", required: false, placeholder: "340.00" },
+            { name: "lastSalePrice", label: "Last Sale", required: false, placeholder: "355.00" },
           ].map((field) => (
             <div key={field.name}>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5">{field.label}</label>
@@ -170,7 +192,6 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
         </div>
       </div>
 
-      {/* ── Media ─────────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Media</h2>
         <div>
@@ -186,12 +207,9 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
         </div>
       </div>
 
-      {/* ── Visibility & Section ──────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Visibility & Promotion</h2>
         <div className="space-y-5">
-
-          {/* Section radio picker */}
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-2">Section *</label>
             <div className="grid grid-cols-2 gap-2">
@@ -252,8 +270,7 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
           </div>
         </div>
       </div>
-
-      {/* ── Actions ───────────────────────────────────────────────────────── */}
+      
       <div className="flex items-center gap-3 pb-8">
         <button
           type="submit"

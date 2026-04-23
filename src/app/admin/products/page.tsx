@@ -2,8 +2,6 @@ import { db } from "@/src/db";
 import { products } from "@/src/db/schema";
 import { desc } from "drizzle-orm";
 import Link from "next/link";
-// import { deleteProduct, toggleFeatured } from "./actions";
-import { deleteProduct, toggleFeatured } from "./action";
 import Image from "next/image";
 import DeleteProductForm from "@/src/components/ui/DeleteButton";
 import ToggeleFeature from "@/src/components/ui/ToggleFeature";
@@ -29,7 +27,6 @@ export default async function AdminProductsPage() {
         </Link>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -57,7 +54,6 @@ export default async function AdminProductsPage() {
               ) : (
                 allProducts.map((product) => (
                   <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                    {/* Product */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 relative">

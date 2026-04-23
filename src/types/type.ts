@@ -1,4 +1,4 @@
-export const NAV_LINKs = [
+export const NAV_LINKS = [
   { label: "All", href: "/browse" },
   { label: "Brands", href: "/browse/brands" },
   { label: "Trending", href: "/browse/trending" },
@@ -6,7 +6,7 @@ export const NAV_LINKs = [
   { label: "Deals", href: "/browse/deals", accent: true },
   { label: "Men", href: "/browse/men" },
   { label: "Women", href: "/browse/women" },
-  { label: "Sneaker", href: "/browse/sneaker" },
+  { label: "Sneaker", href: "/browse/sneakers" },
   { label: "Shoes", href: "/browse/shoes" },
   { label: "Apparel", href: "/browse/apparel" },
   { label: "Accessories", href: "/browse/accessories" },
@@ -15,12 +15,44 @@ export const NAV_LINKs = [
   { label: "More", href: "/browse/more" },
 ]
 
+export const SUBCATEGORIES: Record<string, { label: string; slug: string }[]> = {
+  shoes: [
+    { label: "Slides & Sandals", slug: "slides-sandals" },
+    { label: "Cleats", slug: "cleats" },
+    { label: "Boots", slug: "boots" },
+    { label: "Clogs", slug: "clogs" },
+    { label: "Loafers", slug: "loafers" },
+    { label: "Heels", slug: "heels" },
+    { label: "Slippers", slug: "slippers" },
+    { label: "Oxfords", slug: "oxfords" },
+    { label: "Flats", slug: "flats" },
+    { label: "Spikes", slug: "spikes" },
+    { label: "Sandals", slug: "sandals" },
+  ],
+  sneakers: [
+    { label: "Lifestyle", slug: "lifestyle" },
+    { label: "Luxury", slug: "luxury" },
+    { label: "Running", slug: "running" },
+    { label: "Basketball", slug: "basketball" },
+    { label: "Skate", slug: "skate" },
+    { label: "Soccer Cleats", slug: "soccer-cleats" },
+    { label: "Slip-On", slug: "slip-on" },
+  ],
+  apparel: [
+    { label: "Hoodies", slug: "hoodies" },
+    { label: "T-Shirts", slug: "t-shirts" },
+    { label: "Shorts", slug: "shorts" },
+    { label: "Pants", slug: "pants" },
+    { label: "Jackets", slug: "jackets" },
+  ],
+}
+
 export const NAV_ITEMS = [
-  { label: "Overview", href: "/admin", icon: "▦" },
-  { label: "Products", href: "/admin/products", icon: "👟" },
-  { label: "Categories", href: "/admin/categories", icon: "🗂" },
-  { label: "Orders", href: "/admin/orders", icon: "📦" },
-  { label: "Users", href: "/admin/users", icon: "👥" },
+  { label: "Overview", href: "/admin", icon: "" },
+  { label: "Products", href: "/admin/products", icon: "" },
+  { label: "Categories", href: "/admin/categories", icon: "" },
+  { label: "Orders", href: "/admin/orders", icon: "" },
+  { label: "Users", href: "/admin/users", icon: "" },
 ]
 
 export const SLUG_MAP: Record<string, { type: "category" | "section" | "all"; value?: string; label:string}> = {
