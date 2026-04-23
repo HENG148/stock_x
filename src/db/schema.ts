@@ -20,8 +20,6 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
-// ─── Accounts (NextAuth OAuth) ────────────────────────────────────────────────
-
 export const accounts = pgTable("accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),

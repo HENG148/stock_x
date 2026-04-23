@@ -18,13 +18,13 @@ export function ProductCard({
   isWatched,
   userId,
 }: {
-  product: RecommendedProduct;
-  isWatched: boolean;
-  userId?: string;
+    product: RecommendedProduct;
+    isWatched: boolean;
+    userId?: string
   }) {
   const category = product.category?.toLowerCase() ?? "products";
-  // const href = `/${category}/${product.slug ?? product.id}`;
-  const href =`/product/${product.slug}`
+  const href = `/${category}/${product.slug ?? product.id}`;
+  // const href =`/product/${product.slug}`
   const price = product.lowestAsk
     ? `$${Number(product.lowestAsk).toLocaleString()}`
     : "-";
