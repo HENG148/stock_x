@@ -32,7 +32,9 @@ export async function createProduct(formData: FormData) {
   const category = formData.get("category") as string;
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
-  const slug = await makeUniqueSlug(name)
+  const slug = await makeUniqueSlug(name);
+
+  const section = formData.get("section") as string || "all"
 
   const featuredUntil = isFeatured
     ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
@@ -53,6 +55,7 @@ export async function createProduct(formData: FormData) {
     isFeatured,
     featuredUntil,
     stock,
+    section
   });
   revalidatePath("/admin/products");
   revalidatePath("/");
@@ -72,6 +75,8 @@ export async function updateProduct(id: string, formData: FormData) {
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
   const slug = await makeUniqueSlug(name, id)
+
+  const section = formData.get("section") as string || "all";
  
   await db
     .update(products)
@@ -89,6 +94,7 @@ export async function updateProduct(id: string, formData: FormData) {
       category: category || null,
       isFeatured,
       stock,
+      section
     })
     .where(eq(products.id, id));
  

@@ -39,7 +39,7 @@ export function ProductCard({
               alt={product.name}
               fill
               sizes="300px"
-              className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
+              className="object-contain aspect-ratio p-6 transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
         ) : (

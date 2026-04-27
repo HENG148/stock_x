@@ -1,11 +1,10 @@
-"use server"
-
 import { db } from "@/src/db";
 import { categories } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 async function createCategory(formData: FormData) {
+  "use server"
   const name = formData.get("name") as string;
   const slug = name.toLowerCase().replace(/\s+/g, "-");
   const imageUrl = formData.get("imageUrl") as string;
@@ -20,6 +19,7 @@ async function createCategory(formData: FormData) {
 }
 
 async function deleteCategory(id: string) {
+  "use server"
   await db.delete(categories).where(eq(categories.id, id));
   revalidatePath("/admin/categories");
 }

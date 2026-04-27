@@ -23,7 +23,7 @@ export default function ProductGallery({ product }: any) {
         </div>
         {product.imageUrl && (
           <div className="w-20 h-20 rounded-xl border border-gray-200 relative overflow-hidden">
-            <Image src={product.imageUrl} alt={product.name} fill />
+            <Image className="object-contain p-1" src={product.imageUrl} alt={product.name} fill />
           </div>
         )}
       </div>

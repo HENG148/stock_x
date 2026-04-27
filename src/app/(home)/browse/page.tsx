@@ -1,6 +1,7 @@
 import { auth } from "@/src/auth";
 import { buildUrl } from "@/src/components/BuildUrl";
 import { ProductCard } from "@/src/components/ProductCard";
+import Pagination from "@/src/components/ui/pagination";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
 import { BRANDS, CATEGORIES, SORT_OPTIONS, SUBCATEGORIES } from "@/src/types/type";
@@ -14,6 +15,7 @@ export default async function ProductPage({ searchParams }: {
     cat?: string;
     sort?: string;
     section?: string;
+    page?: string;
   }>
 }) {
   const params = await searchParams;
@@ -62,9 +64,15 @@ export default async function ProductPage({ searchParams }: {
       (a, b) => Number(b.lowestAsk ?? 0) - Number(a.lowestAsk ?? 0)
     );
   } else if (sort === "price_asc") {
-    filtered = [...filtered].sort((a, b) => Number(a.price) - Number(b.price));
+    filtered = [...filtered]
+      .filter((p) => Number(p.lowestAsk ?? p.price) <= 499)
+      // .sort((a, b) => Number(a.price) - Number(b.price));
+      .sort((a, b) => Number(b.lowestAsk ?? b.price) - Number(a.lowestAsk ?? a.price))
   } else if (sort === "price_desc") {
-    filtered = [...filtered].sort((a, b) => Number(b.price) - Number(a.price));
+    filtered = [...filtered]
+      .filter((p) => Number(p.lowestAsk ?? p.price) >= 500)
+      // .sort((a, b) => Number(b.price) - Number(a.price));
+      .sort((a, b) => Number(b.lowestAsk ?? b.price) - Number(a.lowestAsk ?? a.price));
   }
 
   if (section) {
@@ -75,7 +83,7 @@ export default async function ProductPage({ searchParams }: {
 
   let watchedIds = new Set<string>();
   if (userId && filtered.length > 0) {
-    const ids     = filtered.map((p) => p.id);
+    const ids = filtered.map((p) => p.id);
     const watched = await db
       .select({ productId: watchlist.productId })
       .from(watchlist)
@@ -84,10 +92,15 @@ export default async function ProductPage({ searchParams }: {
   }
   const activeFilters = [query, brand, cat].filter(Boolean).length;
 
+  const page = Math.max(1, Number(params.page ?? 1))
+
+  const PAGE_SIZE = 20;
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-360 mx-auto px-6 py-8">
-
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">
             {query ? `Results for "${query}"` :
@@ -174,7 +187,7 @@ export default async function ProductPage({ searchParams }: {
           </aside>
 
           <div className="flex-1 min-w-0">
-            {filtered.length === 0 ? (
+            {filtered.length === 0 ? ( 
               <div className="flex flex-col items-center justify-center py-24 text-center">
                 <div className="text-5xl mb-4">👟</div>
                 <p className="text-lg font-semibold text-gray-700">
@@ -191,16 +204,23 @@ export default async function ProductPage({ searchParams }: {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filtered.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isWatched={watchedIds.has(product.id)}
-                    userId={userId}
-                  />
-                ))}
-              </div>
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {paginated.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        isWatched={watchedIds.has(product.id)}
+                        userId={userId}
+                      />
+                    ))}
+                    </div>
+                    <Pagination 
+                      currentPage={page} 
+                      totalPages={totalPages} 
+                      params={params} 
+                    />
+                </>
             )}
           </div>
         </div>

@@ -94,7 +94,6 @@ export function HeroCarousel() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* ── Slide ──────────────────────────────────────────────────────── */}
       <div
         className={`relative w-full h-55 md:h-70 rounded-2xl overflow-hidden transition-colors duration-500 mx-auto max-w-338`}
         style={{ background: slide.bg }}

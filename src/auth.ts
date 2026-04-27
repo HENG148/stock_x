@@ -21,7 +21,6 @@ export const authConfig: NextAuthConfig ={
         const result = await db
           .select()
           .from(users)
-          // .where(eq(users.email, credentials.email!))
           .where(sql`${users.email} = ${email}`)
           .limit(1);
         
@@ -67,7 +66,7 @@ export const authConfig: NextAuthConfig ={
       return session;
     }
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET,
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)

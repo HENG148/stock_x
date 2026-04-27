@@ -32,9 +32,9 @@ const CATEGORIES = [
 
 const SECTIONS = [
   { value: "all", label: "All Products", description: "General browse only, no promotion" },
-  { value: "trending", label: "Trending — Recommended", description: "Shows in Recommended For You" },
-  { value: "new", label: "New Arrivals", description: "Shows in New Arrivals section" },
-  { value: "deals", label: "Deals", description: "Shows in Deals section" },
+  { value: "recommended", label: "Recommended For You", description: "Shows in Recommended section" },
+  { value: "trending", label: "Trending Now", description: "Shows in Trending section" },
+  { value: "new_arrivals", label: "New Arrivals", description: "Shows in New Arrivals section" },
 ];
 
 export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Product" }: ProductFormProps) {

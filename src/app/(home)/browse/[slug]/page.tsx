@@ -145,7 +145,6 @@ export default async function BrowseSlugPage({
                   {filter.label}
                 </p> 
                 <div className="flex flex-col gap-0.5">
-                  {/* All option */}
                   <Link
                     href={buildSlugUrl({ section: "" })}
                     className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
@@ -172,7 +171,7 @@ export default async function BrowseSlugPage({
                 </div>
               </div>
             )}
- 
+            
             <div>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
                 Browse

@@ -122,13 +122,13 @@ export const watchlist = pgTable("watchlist", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export type User       = typeof users.$inferSelect;
-export type NewUser    = typeof users.$inferInsert;
-export type Product    = typeof products.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
-export type Order      = typeof orders.$inferSelect;
-export type OrderItem  = typeof orderItems.$inferSelect;
-export type Listing    = typeof listings.$inferSelect;
-export type Bid        = typeof bids.$inferSelect;
-export type Watchlist  = typeof watchlist.$inferSelect;
-export type Category   = typeof categories.$inferSelect;
+export type Order = typeof orders.$inferSelect;
+export type OrderItem = typeof orderItems.$inferSelect;
+export type Listing = typeof listings.$inferSelect;
+export type Bid = typeof bids.$inferSelect;
+export type Watchlist = typeof watchlist.$inferSelect;
+export type Category = typeof categories.$inferSelect;

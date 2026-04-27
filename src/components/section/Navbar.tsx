@@ -25,12 +25,14 @@ export async function Navbar() {
             <NavLink href="/news">News</NavLink>
             <NavLink href="/about">About</NavLink>
             <NavLink href="/help">Help</NavLink>
+            <NavLink href="/sell">Sell</NavLink>
 
             {user ? (
               <>
-                <NavLink href="/sell">Sell</NavLink>
-                <BellButton />
-                <AvatarMenu name={user.name} email={user.email} />
+                <div className="gap-3 flex items-center shrink-0">
+                  <BellButton />
+                  <AvatarMenu name={user.name} email={user.email} />
+                </div>
               </>
             ) : (
               <>
