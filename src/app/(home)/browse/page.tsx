@@ -13,6 +13,7 @@ export default async function ProductPage({ searchParams }: {
     q?: string;
     brand?: string;
     cat?: string;
+    subcat?: string;
     sort?: string;
     section?: string;
     page?: string;
@@ -22,6 +23,7 @@ export default async function ProductPage({ searchParams }: {
   const query = params.q?.trim() ?? "";
   const brand = params.brand ?? "";
   const cat = params.cat?.trim() ?? "";
+  const subcat = params.subcat?.trim() ?? "";
   const sort = params.sort ?? "newest"
   const session = await auth();
   const userId = session?.user?.id;
@@ -36,6 +38,7 @@ export default async function ProductPage({ searchParams }: {
       lowestAsk: products.lowestAsk,
       price: products.price,
       category: products.category,
+      subcategory: products.subcategory,
       section: products.section,
       createdAt: products.createdAt,
       slug: products.slug
@@ -55,11 +58,17 @@ export default async function ProductPage({ searchParams }: {
     )
   }
 
+  if (subcat) {
+    filtered = filtered.filter(
+      (p) => p.subcategory?.toLowerCase() === subcat.toLowerCase()
+    );
+  }
+
   if (sort === "lowest_ask") {
     filtered = [...filtered].sort(
       (a, b) => Number(a.lowestAsk ?? 9999999) - Number(b.lowestAsk ?? 9999999)
     );
-  } else if (sort === "hightest_ask") {
+  } else if (sort === "highest_ask") {
     filtered = [...filtered].sort(
       (a, b) => Number(b.lowestAsk ?? 0) - Number(a.lowestAsk ?? 0)
     );
@@ -90,7 +99,7 @@ export default async function ProductPage({ searchParams }: {
       .where(inArray(watchlist.productId, ids));
     watchedIds = new Set(watched.map((w) => w.productId));
   }
-  const activeFilters = [query, brand, cat].filter(Boolean).length;
+  const activeFilters = [query, brand, cat, subcat].filter(Boolean).length;
 
   const page = Math.max(1, Number(params.page ?? 1))
 

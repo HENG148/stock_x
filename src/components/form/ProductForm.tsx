@@ -130,7 +130,7 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
             >
               <option value="">Select subcategory</option>
               {subcategories.map((sub) => (
-                <option key={sub.slug} value={sub.slug}>
+                <option key={sub.slug} value={sub.label}>
                   {sub.label}
                 </option>
               ))}

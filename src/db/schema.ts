@@ -64,6 +64,7 @@ export const products = pgTable("products", {
   stock: integer("stock").default(0),
   imageUrl: varchar("image_url", { length: 500 }),
   category: varchar("category", { length: 100 }),
+  subcategory: varchar("subcategory", { length: 100 }),
   categoryId: uuid("category_id").references(() => categories.id, { onDelete: "set null" }),
 
   isFeatured: boolean("is_featured").default(false),

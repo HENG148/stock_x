@@ -30,6 +30,7 @@ export async function createProduct(formData: FormData) {
   const lastSalePrice = formData.get("lastSalePrice") as string;
   const imageUrl = formData.get("imageUrl") as string;
   const category = formData.get("category") as string;
+  const subcategory = formData.get("subcategory") as string;
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
   const slug = await makeUniqueSlug(name);
@@ -52,6 +53,7 @@ export async function createProduct(formData: FormData) {
     lastSalePrice: lastSalePrice || null,
     imageUrl: imageUrl || null,
     category: category || null,
+    subcategory: subcategory || null,
     isFeatured,
     featuredUntil,
     stock,
@@ -72,6 +74,7 @@ export async function updateProduct(id: string, formData: FormData) {
   const lastSalePrice = formData.get("lastSalePrice") as string;
   const imageUrl = formData.get("imageUrl") as string;
   const category = formData.get("category") as string;
+  const subcategory = formData.get("subcategory") as string;
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
   const slug = await makeUniqueSlug(name, id)
@@ -92,6 +95,7 @@ export async function updateProduct(id: string, formData: FormData) {
       lastSalePrice: lastSalePrice || null,
       imageUrl: imageUrl || null,
       category: category || null,
+      subcategory: subcategory || null,
       isFeatured,
       stock,
       section

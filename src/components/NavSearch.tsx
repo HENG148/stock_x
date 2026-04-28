@@ -2,6 +2,21 @@
 
 import { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { SLUG_MAP, SUBCATEGORIES } from "../types/type";
+
+const SUBCATEGORY_ROUTES: Record<string, string> = {};
+Object.entries(SUBCATEGORIES).forEach(([parentSlug, subs]) => {
+  subs.forEach((sub) => {
+    SUBCATEGORY_ROUTES[sub.label.toLowerCase()] = `/browse/${parentSlug}?sub=${sub.label}`;
+    SUBCATEGORY_ROUTES[sub.slug.toLowerCase()] = `/browse/${parentSlug}?sub=${sub.label}`;
+  })
+})
+
+const CATEGORY_ROUTES: Record<string, string> = {};
+Object.entries(SLUG_MAP).forEach(([slug, filter]) => {
+  CATEGORY_ROUTES[filter.label.toLowerCase()] = `/browse/${slug}`;
+  CATEGORY_ROUTES[slug.toLowerCase()] = `/browse/${slug}`;
+});
 
 export function NavSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -21,7 +36,50 @@ export function NavSearch() {
 
   const search = () => {
     const q = inputRef.current?.value.trim();
-    if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+    // if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+    if (!q) return;
+    const lower = q.toLowerCase();
+
+     // 1. Check subcategory match → /browse/sneakers?sub=Basketball
+    if (SUBCATEGORY_ROUTES[lower]) {
+      router.push(SUBCATEGORY_ROUTES[lower]);
+      return;
+    }
+
+    // 2. Check category match → /browse/sneakers
+    if (CATEGORY_ROUTES[lower]) {
+      router.push(CATEGORY_ROUTES[lower]);
+      return;
+    }
+
+    // 3. Check partial subcategory match
+    const subMatch = Object.entries(SUBCATEGORY_ROUTES).find(([key]) =>
+      key.includes(lower) || lower.includes(key)
+    );
+    if (subMatch) {
+      router.push(subMatch[1]);
+      return;
+    }
+
+    // 4. Check partial category match
+    const catMatch = Object.entries(CATEGORY_ROUTES).find(([key]) =>
+      key.includes(lower) || lower.includes(key)
+    );
+    if (catMatch) {
+      router.push(catMatch[1]);
+      return;
+    }
+
+    // 5. Check brand match
+    const BRANDS = ["Nike", "Adidas", "Jordan", "Yeezy", "Puma", "New Balance", "Converse", "Vans", "Reebok", "Asics"];
+    const brandMatch = BRANDS.find(b => b.toLowerCase() === lower);
+    if (brandMatch) {
+      router.push(`/browse?brand=${encodeURIComponent(brandMatch)}`);
+      return;
+    }
+
+    // 5. Fallback → general search
+    router.push(`/browse?q=${encodeURIComponent(q)}`);
   };
 
   return (

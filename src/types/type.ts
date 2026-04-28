@@ -1,3 +1,7 @@
+// export const CarouselInfo {
+
+// }
+
 export const NAV_LINKS = [
   { label: "All", href: "/browse" },
   { label: "Brands", href: "/browse/brands" },
@@ -15,35 +19,36 @@ export const NAV_LINKS = [
   { label: "More", href: "/browse/more" },
 ]
 
-export const SUBCATEGORIES: Record<string, { label: string; slug: string }[]> = {
+export const SUBCATEGORIES: Record<string, { type?: string; label: string; slug: string }[]> = {
   shoes: [
-    { label: "Slides & Sandals", slug: "slides-sandals" },
-    { label: "Cleats", slug: "cleats" },
-    { label: "Boots", slug: "boots" },
-    { label: "Clogs", slug: "clogs" },
-    { label: "Loafers", slug: "loafers" },
-    { label: "Heels", slug: "heels" },
-    { label: "Slippers", slug: "slippers" },
-    { label: "Oxfords", slug: "oxfords" },
-    { label: "Flats", slug: "flats" },
-    { label: "Spikes", slug: "spikes" },
-    { label: "Sandals", slug: "sandals" },
+    { type: "subcategory", label: "Slides & Sandals", slug: "slides-sandals" },
+    { type: "subcategory", label: "Cleats", slug: "cleats" },
+    { type: "subcategory", label: "Boots", slug: "boots" },
+    { type: "subcategory", label: "Clogs", slug: "clogs" },
+    { type: "subcategory", label: "Loafers", slug: "loafers" },
+    { type: "subcategory", label: "Heels", slug: "heels" },
+    { type: "subcategory", label: "Slippers", slug: "slippers" },
+    { type: "subcategory", label: "Oxfords", slug: "oxfords" },
+    { type: "subcategory", label: "Flats", slug: "flats" },
+    { type: "subcategory", label: "Spikes", slug: "spikes" },
+    { type: "subcategory", label: "Sandals", slug: "sandals" },
   ],
   sneakers: [
-    { label: "Lifestyle", slug: "lifestyle" },
-    { label: "Luxury", slug: "luxury" },
-    { label: "Running", slug: "running" },
-    { label: "Basketball", slug: "basketball" },
-    { label: "Skate", slug: "skate" },
-    { label: "Soccer Cleats", slug: "soccer-cleats" },
-    { label: "Slip-On", slug: "slip-on" },
+    { type: "subcategory", label: "Lifestyle", slug: "lifestyle" },
+    { type: "subcategory", label: "Luxury", slug: "luxury" },
+    { type: "subcategory", label: "Running", slug: "running" },
+    { type: "subcategory", label: "Basketball", slug: "basketball" },
+    { type: "subcategory", label: "Skate", slug: "skate" },
+    { type: "subcategory", label: "Soccer Cleats", slug: "soccer-cleats" },
+    { type: "subcategory", label: "Slip-On", slug: "slip-on" },
   ],
   apparel: [
-    { label: "Hoodies", slug: "hoodies" },
-    { label: "T-Shirts", slug: "t-shirts" },
-    { label: "Shorts", slug: "shorts" },
-    { label: "Pants", slug: "pants" },
-    { label: "Jackets", slug: "jackets" },
+    { type: "subcategory", label: "Hoodies", slug: "hoodies" },
+    { type: "subcategory", label: "Jersey", slug: "jersey" },
+    { type: "subcategory", label: "T-Shirts", slug: "t-shirts" },
+    { type: "subcategory", label: "Shorts", slug: "shorts" },
+    { type: "subcategory", label: "Pants", slug: "pants" },
+    { type: "subcategory", label: "Jackets", slug: "jackets" },
   ],
 }
 
@@ -55,7 +60,7 @@ export const NAV_ITEMS = [
   { label: "Users", href: "/admin/users", icon: "" },
 ]
 
-export const SLUG_MAP: Record<string, { type: "category" | "section" | "all"; value?: string; label:string}> = {
+export const SLUG_MAP: Record<string, { type: "category" | "section" | "all" | "subcategory"; value?: string; label: string; parent?: string; }> = {
   "trending": { type: "section", value: "trending", label: "Trending" },
   "new": { type: "section", value: "new", label: "New Arrivals" },
   "deals": { type: "section", value: "deals", label: "Deals" },

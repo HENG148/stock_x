@@ -2,7 +2,7 @@ import { auth } from "@/src/auth";
 import { ProductCard } from "@/src/components/ProductCard";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
-import { CATEGORIES, SLUG_MAP, SORT_OPTIONS, SUBCATEGORIES } from "@/src/types/type";
+import { BRANDS, CATEGORIES, SLUG_MAP, SORT_OPTIONS, SUBCATEGORIES } from "@/src/types/type";
 import { desc, eq, inArray } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,7 +12,7 @@ export default async function BrowseSlugPage({
   searchParams,
 }: {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ sort?: string; brand?: string, section?: string }>;
+    searchParams: Promise<{ sort?: string; brand?: string; sub?: string; section?: string }>;
 }) {
   const { slug } = await params;
   const sp = await searchParams;
@@ -35,6 +35,7 @@ export default async function BrowseSlugPage({
       lowestAsk: products.lowestAsk,
       price: products.price,
       category: products.category,
+      subcategory: products.subcategory,
       section: products.section,
       createdAt: products.createdAt,
       slug: products.slug
@@ -43,6 +44,8 @@ export default async function BrowseSlugPage({
     .where(
       filter.type === "category"
         ? eq(products.category, filter.value ?? "")
+        : filter.type === "subcategory"
+        ? eq(products.subcategory, filter.value ?? "")
         : eq(products.section, filter.value ?? "")
     )
     .orderBy(desc(products.createdAt));
@@ -55,11 +58,14 @@ export default async function BrowseSlugPage({
     );
   }
 
-  if (section) {
+  const subFilter = sp.sub ?? "";
+
+  if (subFilter) {
     allProducts = allProducts.filter(
-      (p)=>p.section?.toLowerCase()===section.toLowerCase()
+      (p) => p.subcategory?.toLowerCase()===subFilter.toLowerCase()
     )
   }
+
  
   if (sort === "lowest_ask") {
     allProducts = [...allProducts].sort(
@@ -88,13 +94,20 @@ export default async function BrowseSlugPage({
   function buildSlugUrl(overrides: {
     sort?: string; 
     brand?: string;
-    section?: string
+    sub?: string
   }) {
-    const merged = { sort, brand: brandFilter, section, ...overrides }
+    const merged = {
+      sort,
+      brand: brandFilter,
+      section,
+      sub: subFilter,
+      ...overrides
+    }
     const query = new URLSearchParams();
     if (merged.sort && merged.sort !== "newest") query.set("sort", merged.sort);
     if (merged.brand) query.set("brand", merged.brand);
-    if (merged.section) query.set("section", merged.section);
+    // if (merged.section) query.set("section", merged.section);
+    if(merged.sub) query.set("sub", merged.sub)
     const qs = query.toString();
     return `/browse/${slug}${qs ? `?${qs}` : ""}`;
   }
@@ -126,7 +139,8 @@ export default async function BrowseSlugPage({
                 {SORT_OPTIONS.map((opt) => (
                   <Link
                     key={opt.value}
-                    href={`/browse/${slug}?sort=${opt.value}${brandFilter ? `&brand=${brandFilter}` : ""}`}
+                    // href={`/browse/${slug}?sort=${opt.value}${brandFilter ? `&brand=${brandFilter}` : ""}`}
+                    href={buildSlugUrl({sort:opt.value})}
                     className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
                       sort === opt.value
                         ? "bg-gray-900 text-white font-semibold"
@@ -146,9 +160,10 @@ export default async function BrowseSlugPage({
                 </p> 
                 <div className="flex flex-col gap-0.5">
                   <Link
-                    href={buildSlugUrl({ section: "" })}
+                    
+                    href={buildSlugUrl({ sub: "" })}
                     className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
-                      !section
+                      !subFilter
                         ? "bg-gray-900 text-white font-semibold"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
@@ -158,9 +173,9 @@ export default async function BrowseSlugPage({
                   {subcategories.map((sub) => (
                     <Link
                       key={sub.slug}
-                      href={buildSlugUrl({ section: section === sub.slug ? "" : sub.slug })}
+                      href={buildSlugUrl({ sub: subFilter === sub.label ? "" : sub.label })}
                       className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
-                        section === sub.slug
+                        subFilter === sub.label
                           ? "bg-gray-900 text-white font-semibold"
                           : "text-gray-600 hover:bg-gray-100"
                       }`}
@@ -171,13 +186,26 @@ export default async function BrowseSlugPage({
                 </div>
               </div>
             )}
-            
+
             <div>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-                Browse
+                Brands
               </p>
               <div className="flex flex-col gap-0.5">
-                {Object.entries(SLUG_MAP).map(([s, f]) => (
+                {BRANDS.map((b) => (
+                  <Link
+                    key={b}
+                    href={buildSlugUrl({ brand: brandFilter === b ? "" : b })}
+                    className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
+                      brandFilter === b
+                        ? "bg-gray-900 text-white font-semibold"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {b}
+                  </Link>
+                ))}
+                {/* {Object.entries(SLUG_MAP).map(([s, f]) => (
                   <Link
                     key={s}
                     href={`/browse/${s}`}
@@ -189,7 +217,7 @@ export default async function BrowseSlugPage({
                   >
                     {f.label}
                   </Link>
-                ))}
+                ))} */}
               </div>
             </div>
           </aside>
