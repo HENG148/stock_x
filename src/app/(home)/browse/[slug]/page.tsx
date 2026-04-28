@@ -1,5 +1,6 @@
 import { auth } from "@/src/auth";
 import { ProductCard } from "@/src/components/ProductCard";
+import Pagination from "@/src/components/ui/pagination";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
 import { BRANDS, CATEGORIES, SLUG_MAP, SORT_OPTIONS, SUBCATEGORIES } from "@/src/types/type";
@@ -12,7 +13,10 @@ export default async function BrowseSlugPage({
   searchParams,
 }: {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ sort?: string; brand?: string; sub?: string; section?: string }>;
+    searchParams: Promise<{
+      sort?: string; brand?: string; sub?: string; section?: string;
+      page?: string;
+    }>;
 }) {
   const { slug } = await params;
   const sp = await searchParams;
@@ -95,13 +99,15 @@ export default async function BrowseSlugPage({
   function buildSlugUrl(overrides: {
     sort?: string; 
     brand?: string;
-    sub?: string
+    sub?: string;
+    page?: string;
   }) {
     const merged = {
       sort,
       brand: brandFilter,
       section,
       sub: subFilter,
+      page: String(page),
       ...overrides
     }
     const query = new URLSearchParams();
@@ -112,6 +118,11 @@ export default async function BrowseSlugPage({
     const qs = query.toString();
     return `/browse/${slug}${qs ? `?${qs}` : ""}`;
   }
+
+  const page = Math.max(1, Number(sp.page ?? 1));
+  const PAGE_SIZE = 20;
+  const totalPages = Math.ceil(allProducts.length / PAGE_SIZE)
+  const paginated = allProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const subcategories = SUBCATEGORIES[slug.toLowerCase()];
   return (
@@ -241,16 +252,23 @@ export default async function BrowseSlugPage({
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {allProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isWatched={watchedIds.has(product.id)}
-                    userId={userId}
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {paginated.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        isWatched={watchedIds.has(product.id)}
+                        userId={userId}
+                      />
+                    ))}
+                  </div>
+                  <Pagination 
+                    currentPage={page}
+                    totalPages={totalPages}
+                    params={{ sort, brand: brandFilter, sub: subFilter, slug}}
                   />
-                ))}
-              </div>
+                </>
             )}
           </div>
         </div>
