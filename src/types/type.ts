@@ -141,3 +141,36 @@ export const FOOTER_COLS = [
   { title: "Sell", links: ["Selling Guide", "Professional Tools", "StockX Pro", "Sponsored Asks", "Developers"] },
   { title: "Help", links: ["Help Center", "Contact Us", "Product Suggestions", "Size Guide"] },
 ];
+
+export const POPULAR_BRANDS = [
+  {
+    name: "Jordan",
+    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/3/37/Jumpman_logo.svg/1200px-Jumpman_logo.svg.png",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/blt227248c57913601d/6965696d6e95f90008bf0b5e/Jordan_(1).jpg?auto=webp&format=pjpg&quality=75&dpr=2&width=234&height=160",
+    href: "/browse/sneakers?brand=Jordan",
+  },
+  {
+    name: "Fear of God",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Fear_of_God_logo.svg/1200px-Fear_of_God_logo.svg.png",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/blt59ab3597035c152d/69d7b1cd947c812965e675ec/Fear_of_God_(3).jpg?auto=webp&format=pjpg&quality=75&dpr=2&width=234&height=160",
+    href: "/browse/apparel?brand=Fear+of+God",
+  },
+  {
+    name: "Nike",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/bltf1a26fb968ef84c0/69666022bc982f0008f22093/POP_MART_(2).jpg?auto=webp&amp;format=pjpg&amp;quality=75&amp;dpr=2&amp;width=234&amp;height=160",
+    href: "/browse/sneakers?brand=Nike",
+  },
+  {
+    name: "Adidas",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/1200px-Adidas_Logo.svg.png",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/bltd3b0b44af6101c32/69665b4f955a7d000811ae00/Supreme_(1).jpg?auto=webp&format=pjpg&quality=75&dpr=2&width=234&height=160",
+    href: "/browse/sneakers?brand=Adidas",
+  },
+  {
+    name: "New Balance",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/New_Balance_logo.svg/1200px-New_Balance_logo.svg.png",
+    image: "https://images-cs.stockx.com/v3/assets/blt818b0c67cf450811/blt26336cf8b8d6f44c/6966737c92a197000922d432/Louis_Vuitton_(1).jpg?auto=webp&format=pjpg&quality=75&dpr=2&width=234&height=160",
+    href: "/browse/sneakers?brand=New+Balance",
+  },
+];

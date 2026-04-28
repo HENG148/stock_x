@@ -96,7 +96,7 @@ export async function RecommendedSection() {
   }
 
   return (
-    <section className="max-w-350 mx-auto px-6 py-8">
+    <section className="max-w-350 mx-auto px-6 py-5">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
            <h2 className="text-[18px] font-bold text-gray-900 tracking-tight">

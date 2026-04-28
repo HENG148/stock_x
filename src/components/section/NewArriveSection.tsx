@@ -43,7 +43,7 @@ export async function NewArrivalsSection() {
   }
 
   return (
-    <section className="max-w-350 mx-auto px-6 py-8">
+    <section className="max-w-350 mx-auto px-6 py-5">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <h2 className="text-[18px] font-bold text-gray-900 tracking-tight">
@@ -55,6 +55,14 @@ export async function NewArrivalsSection() {
           >
             ?
           </button>
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-50 w-max max-w-60 invisible peer-hover:visible opacity-0 peer-hover:opacity-100 transition-all duration-200 pointer-events-none">
+            <div className="bg-gray-900 text-white text-[13px] font-medium leading-snug text-center rounded-lg px-4 py-2.5 shadow-lg">
+              These products are inspired by your previous browsing history.
+            </div>
+            <div className="flex justify-center">
+              <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-gray-900" />
+            </div>
+          </div>
         </div>
         {hasMore && (
           <Link
