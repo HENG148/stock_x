@@ -90,6 +90,12 @@ export default async function ProductPage({ searchParams }: {
     )
   }
 
+  if (query) {
+    filtered = filtered.filter((p) =>
+      p.name?.toLowerCase().includes(query.toLowerCase())
+    )
+  }
+
   let watchedIds = new Set<string>();
   if (userId && filtered.length > 0) {
     const ids = filtered.map((p) => p.id);

@@ -80,6 +80,7 @@ export default async function BrowseSlugPage({
   } else if (sort === "price_desc") {
     allProducts = [...allProducts].sort((a, b) => Number(b.price) - Number(a.price));
   }
+  
  
   let watchedIds = new Set<string>();
   if (userId && allProducts.length > 0) {

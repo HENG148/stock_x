@@ -1,117 +1,101 @@
-"use client";
+  "use client";
 
-import { useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { SLUG_MAP, SUBCATEGORIES } from "../types/type";
+  import { useRef, useEffect } from "react";
+  import { useRouter } from "next/navigation";
+  import { BRANDS, SLUG_MAP, SUBCATEGORIES } from "../types/type";
+  import { PLAYER_ROUTES } from "../data/data";
 
-const SUBCATEGORY_ROUTES: Record<string, string> = {};
-Object.entries(SUBCATEGORIES).forEach(([parentSlug, subs]) => {
-  subs.forEach((sub) => {
-    SUBCATEGORY_ROUTES[sub.label.toLowerCase()] = `/browse/${parentSlug}?sub=${sub.label}`;
-    SUBCATEGORY_ROUTES[sub.slug.toLowerCase()] = `/browse/${parentSlug}?sub=${sub.label}`;
+  const SUBCATEGORY_ROUTES: Record<string, string> = {};
+  Object.entries(SUBCATEGORIES).forEach(([parentSlug, subs]) => {
+    subs.forEach((sub) => {
+      SUBCATEGORY_ROUTES[sub.label.toLowerCase()] = `/browse/${parentSlug}?sub=${sub.label}`;
+      SUBCATEGORY_ROUTES[sub.slug.toLowerCase()] = `/browse/${parentSlug}?sub=${sub.label}`;
+    })
   })
-})
 
-const CATEGORY_ROUTES: Record<string, string> = {};
-Object.entries(SLUG_MAP).forEach(([slug, filter]) => {
-  CATEGORY_ROUTES[filter.label.toLowerCase()] = `/browse/${slug}`;
-  CATEGORY_ROUTES[slug.toLowerCase()] = `/browse/${slug}`;
-});
+  const CATEGORY_ROUTES: Record<string, string> = {};
+  Object.entries(SLUG_MAP).forEach(([slug, filter]) => {
+    CATEGORY_ROUTES[filter.label.toLowerCase()] = `/browse/${slug}`;
+    CATEGORY_ROUTES[slug.toLowerCase()] = `/browse/${slug}`;
+  });
 
-export function NavSearch() {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  export function NavSearch() {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
 
-  /// Ctrl+K shortcut
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        inputRef.current?.focus();
+    /// Ctrl+K shortcut
+    useEffect(() => {
+      const handler = (e: KeyboardEvent) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+          e.preventDefault();
+          inputRef.current?.focus();
+        }
+      };
+      window.addEventListener("keydown", handler);
+      return () => window.removeEventListener("keydown", handler);
+    }, []);
+
+    const search = () => {
+      const q = inputRef.current?.value.trim();
+      // if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+      if (!q) return;
+      const lower = q.toLowerCase();
+
+      console.log("PLAYER_ROUTES:", PLAYER_ROUTES); // add this
+      console.log("lookup result:", PLAYER_ROUTES[lower]);
+      
+      const routeTables = [PLAYER_ROUTES, SUBCATEGORY_ROUTES, CATEGORY_ROUTES]
+      for (const table of routeTables) {
+        if (table[lower]) {
+          router.push(table[lower])
+          return;
+        }
+        const partial = Object.entries(table).find(
+          ([key]) => key.includes(lower) || lower.includes(key)
+        );
+        if (partial) {
+          router.push(partial[1])
+          return;
+        }
       }
+      const brandMatch = BRANDS.find(b => b.toLowerCase() === lower);
+      if (brandMatch) {
+        router.push(`/browse?brand=${encodeURIComponent(brandMatch)}`);
+        return
+      }
+      router.push(`/browse?q=${encodeURIComponent(q)}`);
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
 
-  const search = () => {
-    const q = inputRef.current?.value.trim();
-    // if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
-    if (!q) return;
-    const lower = q.toLowerCase();
+    return (
+      <div className="flex-1 max-w-150">
+        <div className="flex items-center gap-2.5 h-10 px-3.5 rounded-lg bg-gray-100 border-[1.5px] border-transparent focus-within:bg-white focus-within:border-gray-900 focus-within:ring-2 focus-within:ring-gray-900/6 transition-all">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#aaa"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="shrink-0"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
 
-     // 1. Check subcategory match → /browse/sneakers?sub=Basketball
-    if (SUBCATEGORY_ROUTES[lower]) {
-      router.push(SUBCATEGORY_ROUTES[lower]);
-      return;
-    }
-
-    // 2. Check category match → /browse/sneakers
-    if (CATEGORY_ROUTES[lower]) {
-      router.push(CATEGORY_ROUTES[lower]);
-      return;
-    }
-
-    // 3. Check partial subcategory match
-    const subMatch = Object.entries(SUBCATEGORY_ROUTES).find(([key]) =>
-      key.includes(lower) || lower.includes(key)
-    );
-    if (subMatch) {
-      router.push(subMatch[1]);
-      return;
-    }
-
-    // 4. Check partial category match
-    const catMatch = Object.entries(CATEGORY_ROUTES).find(([key]) =>
-      key.includes(lower) || lower.includes(key)
-    );
-    if (catMatch) {
-      router.push(catMatch[1]);
-      return;
-    }
-
-    // 5. Check brand match
-    const BRANDS = ["Nike", "Adidas", "Jordan", "Yeezy", "Puma", "New Balance", "Converse", "Vans", "Reebok", "Asics"];
-    const brandMatch = BRANDS.find(b => b.toLowerCase() === lower);
-    if (brandMatch) {
-      router.push(`/browse?brand=${encodeURIComponent(brandMatch)}`);
-      return;
-    }
-
-    // 5. Fallback → general search
-    router.push(`/browse?q=${encodeURIComponent(q)}`);
-  };
-
-  return (
-    <div className="flex-1 max-w-150">
-      <div className="flex items-center gap-2.5 h-10 px-3.5 rounded-lg bg-gray-100 border-[1.5px] border-transparent focus-within:bg-white focus-within:border-gray-900 focus-within:ring-2 focus-within:ring-gray-900/6 transition-all">
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#aaa"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="shrink-0"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-        </svg>
-
-        <input
-          ref={inputRef}
-          type="text"
-          onKeyDown={(e) => e.key === "Enter" && search()}
-          placeholder="Search for brand, color, etc."
-          aria-label="Search products"
-          className="flex-1 bg-transparent border-none outline-none text-sm text-gray-900 placeholder:text-gray-400 font-[inherit]"
-        />
-        <kbd className="shrink-0 text-[11px] text-gray-400 bg-gray-200 rounded px-1.5 py-0.5 font-[inherit]">
-          Ctrl + K
-        </kbd>
+          <input
+            ref={inputRef}
+            type="text"
+            onKeyDown={(e) => e.key === "Enter" && search()}
+            placeholder="Search for brand, color, etc."
+            aria-label="Search products"
+            className="flex-1 bg-transparent border-none outline-none text-sm text-gray-900 placeholder:text-gray-400 font-[inherit]"
+          />
+          <kbd className="shrink-0 text-[11px] text-gray-400 bg-gray-200 rounded px-1.5 py-0.5 font-[inherit]">
+            Ctrl + K
+          </kbd>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
