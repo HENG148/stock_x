@@ -1,10 +1,13 @@
 'use server'
 
 import { db } from "@/src/db";
-import { products } from "@/src/db/schema";
+import { listings, products } from "@/src/db/schema";
 import { generateSlug } from "@/src/lib/Slug";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+const ADMIN_SELLER_ID = "a189c8ec-3cd0-4592-b1e1-8e5e675c9fdb"
 
 async function makeUniqueSlug(name: string, excludeId?: string): Promise<string> {
   const base = generateSlug(name);
@@ -41,7 +44,7 @@ export async function createProduct(formData: FormData) {
     ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
     : null
 
-  await db.insert(products).values({
+  const newProduct = await db.insert(products).values({
     name,
     slug,
     brand: brand || null,
@@ -58,7 +61,30 @@ export async function createProduct(formData: FormData) {
     featuredUntil,
     stock,
     section
-  });
+  }).returning().then(r => r[0])
+
+  const sizes = formData.getAll("sizes") as string[]
+  console.log("sizes received:", sizes)
+  console.log("all form keys:", [...formData.keys()])  
+  if (sizes.length > 0) {
+    let minAskPrice = Infinity
+    for (const size of sizes){
+      const sizePrice = formData.get(`size_price_${size}`) as string;
+      const askPrice = sizePrice && Number(sizePrice) > 0 ? Number(sizePrice) : Number(price);
+      minAskPrice = Math.min(minAskPrice, askPrice)
+      await db.insert(listings).values({
+        productId: newProduct.id,
+        sellerId: ADMIN_SELLER_ID,
+        askPrice: String(askPrice),
+        size,
+        isActive: true,
+        expiresAt: new Date(Date.now()+365*24*60*60*1000)
+      })
+    }
+    await db.update(products)
+      .set({ lowestAsk: String(minAskPrice) })
+    .where(eq(products.id, newProduct.id))
+  }
   revalidatePath("/admin/products");
   revalidatePath("/");
 }
@@ -104,6 +130,7 @@ export async function updateProduct(id: string, formData: FormData) {
  
   revalidatePath("/admin/products");
   revalidatePath("/");
+  redirect("/admin/products")
 }
  
 export async function deleteProduct(id: string) {

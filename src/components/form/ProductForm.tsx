@@ -37,6 +37,8 @@ const SECTIONS = [
   { value: "new_arrivals", label: "New Arrivals", description: "Shows in New Arrivals section" },
 ];
 
+
+
 export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Product" }: ProductFormProps) {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState(defaultValues.category ?? "");
@@ -46,6 +48,16 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
     : "";
   
   const subcategories = SUBCATEGORIES[selectedCategory.toLowerCase()] ?? [];
+
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [sizePrices, setSizePrices] = useState<Record<string, string>>({});
+  const SIZES = ["4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12", "13", "14"]
+
+  const toggleSize = (size: string) => {
+    setSelectedSizes(prev =>
+      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+    );
+  };
 
   return (
     <form action={action} className="space-y-6">
@@ -189,6 +201,52 @@ export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Pr
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 p-6">
+        <h2 className="text-sm font-semibold text-gray-900 mb-1 uppercase tracking-wide">Available Sizes & Prices</h2>
+        <p className="text-xs text-gray-400 mb-4">Select sizes to create listings. Leave price blank to use retail price.</p>
+        <input type="hidden" name="sizesData" value={JSON.stringify(
+          selectedSizes.map(size => ({
+            size,
+            price: sizePrices[size] ?? ""
+          }))
+        )} />
+
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+          {SIZES.map((size) => {
+            const selected = selectedSizes.includes(size);
+            return (
+              <div key={size} className={`rounded-lg border transition-all ${selected ? "border-gray-900 bg-gray-50" : "border-gray-200"}`}>
+                <button
+                  type="button"
+                  onClick={() => toggleSize(size)}
+                  className={`w-full py-2 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer border-none ${
+                    selected ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {size}
+                </button>
+                {selected && (
+                  <div className="relative p-1.5">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                    <input
+                      name={`size_price_${size}`}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      value={sizePrices[size] ?? ""}
+                      onChange={(e) => setSizePrices(prev => ({ ...prev, [size]: e.target.value }))}
+                      className="w-full pl-5 pr-1 py-1 text-xs border border-gray-200 rounded-md outline-none focus:border-gray-900"
+                    />
+                  </div>
+                )}
+                {selected && <input type="hidden" name="sizes" value={size} />}
+              </div>
+            );
+          })}
         </div>
       </div>
 

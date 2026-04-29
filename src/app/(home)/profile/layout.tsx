@@ -7,13 +7,13 @@ import { eq } from "drizzle-orm";
 import { signOut } from "@/src/auth";
 
 const NAV_ITEMS = [
-  { label: "Profile", sub: "Shipping, Email, Password, Shoe Size", href: "/profile", icon: "👤" },
-  { label: "Buying", sub: "Active Bids, In-Progress, Completed Orders", href: "/profile/buying", icon: "🛍" },
-  { label: "Selling", sub: "Active Asks, Sales, Seller Profile", href: "/profile/selling", icon: "📸" },
-  { label: "Favorites", sub: "Items and lists you've saved", href: "/profile/favorites", icon: "🤍" },
-  { label: "Message Center", sub: "See the latest news", href: "/profile/messages", icon: "🔔" },
-  { label: "Wallet", sub: "Payments, Payouts, Gift Cards, Credits", href: "/profile/wallet", icon: "💳" },
-  { label: "Settings", sub: "Security and Notifications", href: "/profile/settings", icon: "⚙️" },
+  { label: "Profile", sub: "Shipping, Email, Password, Shoe Size", href: "/profile",  },
+  { label: "Buying", sub: "Active Bids, In-Progress, Completed Orders", href: "/profile/buying",  },
+  { label: "Selling", sub: "Active Asks, Sales, Seller Profile", href: "/profile/selling",  },
+  { label: "Favorites", sub: "Items and lists you've saved", href: "/profile/favorites",  },
+  { label: "Message Center", sub: "See the latest news", href: "/profile/messages", },
+  { label: "Wallet", sub: "Payments, Payouts, Gift Cards, Credits", href: "/profile/wallet", },
+  { label: "Settings", sub: "Security and Notifications", href: "/profile/settings" },
 ];
 
 async function handleSignOut() {
@@ -50,9 +50,9 @@ export default async function ProfileLayout({
                 href={item.href}
                 className="flex items-start gap-3 px-4 py-3 rounded-xl no-underline hover:bg-gray-50 transition-colors"
               >
-                <span className="text-lg mt-0.5 w-6 text-center">{item.icon}</span>
+                {/* <span className="text-lg mt-0.5 w-6 text-center">{item.icon}</span> */}
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{item.label}</p>
+                  <p className="text-md font-semibold text-gray-900">{item.label}</p>
                   <p className="text-xs text-gray-400 mt-0.5 leading-snug">{item.sub}</p>
                 </div>
               </Link>

@@ -85,7 +85,6 @@ export default async function BrowseSlugPage({
     allProducts = [...allProducts].sort((a, b) => Number(b.price) - Number(a.price));
   }
   
- 
   let watchedIds = new Set<string>();
   if (userId && allProducts.length > 0) {
     const ids     = allProducts.map((p) => p.id);
@@ -151,7 +150,6 @@ export default async function BrowseSlugPage({
                 {SORT_OPTIONS.map((opt) => (
                   <Link
                     key={opt.value}
-                    // href={`/browse/${slug}?sort=${opt.value}${brandFilter ? `&brand=${brandFilter}` : ""}`}
                     href={buildSlugUrl({sort:opt.value})}
                     className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
                       sort === opt.value
@@ -172,7 +170,6 @@ export default async function BrowseSlugPage({
                 </p> 
                 <div className="flex flex-col gap-0.5">
                   <Link
-                    
                     href={buildSlugUrl({ sub: "" })}
                     className={`text-[13px] px-2.5 py-1.5 rounded-lg no-underline transition-colors ${
                       !subFilter

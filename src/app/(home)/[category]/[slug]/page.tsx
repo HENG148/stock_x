@@ -1,15 +1,17 @@
+import { auth } from "@/src/auth";
+import { MarketAction } from "@/src/components/action/Marketactions";
 import ExpandableDescription from "@/src/components/EnableDescription";
 import ProductGallery from "@/src/components/ProductGallery";
 import { Breadcrumb } from "@/src/components/ui/Breadcrump";
 import { db } from "@/src/db";
-import { products } from "@/src/db/schema";
-import { SIZES } from "@/src/types/type";
-import { eq, or } from "drizzle-orm";
-import Link from "next/link";
+import { listings, products } from "@/src/db/schema";
+import { and, eq, or } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 
 export default async function ProductDetail({ params }: { params: Promise<{ category: string; slug: string }> }) {
   const { category, slug } = await params;
+  const session = await auth()
+  const userId = session?.user?.id
 
   const product = await db
     .select()
@@ -23,6 +25,17 @@ export default async function ProductDetail({ params }: { params: Promise<{ cate
   if (product.category?.toLowerCase() !== category.toLowerCase()) {
     redirect(`/${product.category?.toLowerCase()}/${slug}`);
   }
+
+  const activeListings = await db
+    .select({ size: listings.size, askPrice: listings.askPrice })
+    .from(listings)
+    .where(
+      and(
+        eq(listings.productId, product.id),
+        eq(listings.isActive, true)
+    )
+  )
+  const availableSizes = new Set(activeListings.map((l) => l.size));
   
   return (
     <main className="min-h-screen bg-white">
@@ -72,70 +85,14 @@ export default async function ProductDetail({ params }: { params: Promise<{ cate
               </svg>
             </div>
 
-            <div className="mb-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-700">Size:</span>
-                <span className="text-xs text-gray-400">US Men's</span>
-              </div>
-              <div className="grid grid-cols-6 gap-1.5">
-                {SIZES.map((size) => (
-                  <button
-                    key={size}
-                    className="py-2 text-xs font-medium rounded-lg border border-gray-200 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all cursor-pointer bg-white text-gray-700"
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            <div className="border border-gray-200 rounded-xl p-5 mb-4">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-xs text-gray-400 font-medium mb-0.5">Buy Now for</p>
-                  <p className="text-3xl font-black text-gray-900">
-                    ${Number(product.lowestAsk ?? product.price).toLocaleString()}
-                  </p>
-                </div>
-                {/* Sold count */}
-                <div className="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-lg">
-                  <span className="text-base">⚡</span>
-                  <p className="text-xs font-bold text-gray-800">
-                    {Math.floor(Math.random() * 400) + 50} Sold in Last 3 Days!
-                  </p>
-                </div>
-              </div>
- 
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <button className="py-3 rounded-full border-2 border-gray-900 text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors bg-white cursor-pointer">
-                  Make Offer
-                </button>
-                <button className="py-3 rounded-full bg-[#08a05c] text-sm font-bold text-white hover:bg-[#069050] transition-colors border-none cursor-pointer">
-                  Buy Now
-                </button>
-              </div>
- 
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">
-                  Last Sale:{" "}
-                  <span className="font-semibold text-gray-900">
-                    ${Number(product.lastSalePrice ?? product.price).toLocaleString()}
-                  </span>
-                </span>
-                <button className="text-[#08a05c] font-semibold text-xs hover:underline bg-transparent border-none cursor-pointer">
-                  View Market Data
-                </button>
-              </div>
-            </div>
- 
-            <div className="text-center mb-6">
-              <Link
-                href="/sell"
-                className="text-[#08a05c] font-bold text-sm no-underline hover:underline"
-              >
-                Sell Now for ${Number(product.highestBid ?? product.price).toLocaleString()} or Ask for More →
-              </Link>
-            </div>
+            <MarketAction
+              productId={product.id}
+              userId={userId}
+              lowestAsk={product.lowestAsk}
+              highestBid={product.highestBid}
+              price={product.price}
+              availableSizes={availableSizes} 
+            />
  
             <div className="border-t border-gray-100 divide-y divide-gray-100">
               {[

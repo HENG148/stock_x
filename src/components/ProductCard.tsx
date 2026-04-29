@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toggleWatchlist } from "../server/recommend";
 import { HeartIcon, XpressIcon } from "./icons/icon";
+import { WatchlistButton } from "./WatchListButton";
 
 export type RecommendedProduct = {
   id: string;
@@ -51,18 +52,13 @@ export function ProductCard({
         )}
 
         {userId ? (
-          <form
-            action={toggleWatchlist.bind(null, { productId: product.id, userId, isWatched })}
-            className="absolute top-2.5 right-2.5 z-10"
-          >
-            <button
-              type="submit"
-              aria-label={isWatched ? "Remove from watchlist" : "Add to watchlist"}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
-            >
-              <HeartIcon filled={isWatched} />
-            </button>
-          </form>
+          <div className="absolute top-2.5 right-2.5 z-10">
+            <WatchlistButton 
+              productId={product.id}
+              userId={userId}
+              isWatched={isWatched}
+            />
+          </div>
         ) : (
           <div className="absolute top-2.5 right-2.5 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-white/70 backdrop-blur-sm shadow-sm">
             <HeartIcon filled={false} />

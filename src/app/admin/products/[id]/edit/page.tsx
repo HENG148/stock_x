@@ -16,14 +16,9 @@ export default async function EditProductPage({
     .from(products)
     .where(eq(products.id, id))
     .then((r) => r[0]);
-  
   if (!product) notFound();
 
-  async function handleUpdate(formData: FormData) {
-    "use server"
-    await updateProduct(id, formData);
-    redirect("/admin/products");
-  }
+  const handleUpdate = updateProduct.bind(null, id);
 
   return (
     <div className="p-8">

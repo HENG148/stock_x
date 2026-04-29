@@ -1,6 +1,6 @@
 'use server'
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { watchlist } from "../db/schema";
 
@@ -14,8 +14,25 @@ export async function toggleWatchlist({productId, userId, isWatched}: toggleWatc
   if (isWatched) {
     await db
       .delete(watchlist)
-      .where(eq(watchlist.productId, productId));
+      .where(
+        and(
+          eq(watchlist.productId, productId),
+          eq(watchlist.userId, userId),
+        )
+      );
   } else {
-    await db.insert(watchlist).values({ userId, productId });
+    const existing = await db
+      .select()
+      .from(watchlist)
+      .where(
+        and(
+          eq(watchlist.productId, productId),
+          eq(watchlist.userId, userId)
+      )
+    )
+    .limit(1)
+    if (existing.length === 0) {
+      await db.insert(watchlist).values({ userId, productId });
+    }
   }
 }

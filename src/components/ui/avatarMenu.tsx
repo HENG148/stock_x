@@ -31,10 +31,11 @@ export function AvatarMenu({
  
         <div className="h-px bg-gray-100 my-1" />
  
-        <DropdownLink href="/dashboard">Dashboard</DropdownLink>
         <DropdownLink href="/profile">Profile</DropdownLink>
-        <DropdownLink href="/orders">Orders</DropdownLink>
-        <DropdownLink href="/watchlist">Watchlist</DropdownLink>
+        <DropdownLink href="/profile/buying">Buying</DropdownLink>
+        <DropdownLink href="/profile/selling">Selling</DropdownLink>
+        <DropdownLink href="/profile/favorite">Favorite</DropdownLink>
+        <DropdownLink href="/profile/wallet">Wallets</DropdownLink>
  
         <div className="h-px bg-gray-100 my-1" />
  
