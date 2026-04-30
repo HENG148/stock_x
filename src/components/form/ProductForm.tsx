@@ -22,6 +22,8 @@ type ProductFormProps = {
     section?: string | null;
     subcategory?: string | null;
     stock?: number | null;
+    size?: string[]
+    sizePrice?: Record<string, string>
   };
   submitLabel?: string;
 };
@@ -36,8 +38,6 @@ const SECTIONS = [
   { value: "trending", label: "Trending Now", description: "Shows in Trending section" },
   { value: "new_arrivals", label: "New Arrivals", description: "Shows in New Arrivals section" },
 ];
-
-
 
 export function ProductForm({ action, defaultValues = {}, submitLabel = "Save Product" }: ProductFormProps) {
   const router = useRouter();

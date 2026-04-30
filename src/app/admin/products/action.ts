@@ -107,7 +107,6 @@ export async function updateProduct(id: string, formData: FormData) {
   const isFeatured = formData.get("isFeatured") === "true";
   const stock = Number(formData.get("stock") ?? 0);
   const slug = await makeUniqueSlug(name, id)
-
   const section = formData.get("section") as string || "all";
  
   await db
@@ -128,8 +127,35 @@ export async function updateProduct(id: string, formData: FormData) {
       isFeatured,
       stock,
       section
-    })
-    .where(eq(products.id, id));
+    }).where(eq(products.id, id));
+  
+   const sizes = formData.getAll("sizes") as string[];
+  if (sizes.length > 0) {
+    await db.update(listings)
+      .set({ isActive: false })
+      .where(eq(listings.productId, id));
+
+    let minAskPrice = Infinity;
+    for (const size of sizes) {
+      const sizePrice = formData.get(`size_price_${size}`) as string;
+      const askPrice = sizePrice && Number(sizePrice) > 0 ? Number(sizePrice) : Number(price);
+      minAskPrice = Math.min(minAskPrice, askPrice);
+
+      for (let i = 0; i < 10; i++) {
+        await db.insert(listings).values({
+          productId: id,
+          sellerId: ADMIN_SELLER_ID,
+          askPrice: String(askPrice),
+          size,
+          isActive: true,
+          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        });
+      }
+    }
+    await db.update(products)
+      .set({ lowestAsk: String(minAskPrice) })
+      .where(eq(products.id, id));
+  }
  
   revalidatePath("/admin/products");
   revalidatePath("/");

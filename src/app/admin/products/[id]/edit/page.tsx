@@ -1,6 +1,6 @@
 import { db } from "@/src/db"
-import { products } from "@/src/db/schema"
-import { eq } from "drizzle-orm";
+import { listings, products } from "@/src/db/schema"
+import { and, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { updateProduct } from "../../action";
 import { ProductForm } from "@/src/components/form/ProductForm";
@@ -17,6 +17,17 @@ export default async function EditProductPage({
     .where(eq(products.id, id))
     .then((r) => r[0]);
   if (!product) notFound();
+
+  const activeListings = await db
+    .select({ size: listings.size, askPrice: listings.askPrice })
+    .from(listings)
+    .where(and(eq(listings.productId, id), eq(listings.isActive, true)));
+
+  const existingSizes = [...new Set(activeListings.map(l => l.size).filter(Boolean))] as string[];
+  const existingSizePrices = activeListings.reduce((acc, l) => {
+    if (l.size) acc[l.size] = l.askPrice ?? "";
+    return acc;
+  }, {} as Record<string, string>);
 
   const handleUpdate = updateProduct.bind(null, id);
 
@@ -47,6 +58,8 @@ export default async function EditProductPage({
           isFeatured: product.isFeatured,
           featuredUntil: product.featuredUntil,
           stock: product.stock,
+          size: existingSizes,
+          sizePrice: existingSizePrices
         }}
       />
     </div>
