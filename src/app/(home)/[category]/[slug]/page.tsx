@@ -36,6 +36,13 @@ export default async function ProductDetail({ params }: { params: Promise<{ cate
     )
   )
   const availableSizes = new Set(activeListings.map((l) => l.size));
+  const sizePriceMap = activeListings.reduce((acc, l) => {
+  const key = l.size ?? ""
+  if (!acc[key] || Number(l.askPrice) < Number(acc[key])) {
+    acc[key] = l.askPrice ?? ""
+  }
+  return acc
+}, {} as Record<string, string>)
   
   return (
     <main className="min-h-screen bg-white">
@@ -92,6 +99,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ cate
               highestBid={product.highestBid}
               price={product.price}
               availableSizes={availableSizes} 
+              sizePriceMap={sizePriceMap}
             />
  
             <div className="border-t border-gray-100 divide-y divide-gray-100">

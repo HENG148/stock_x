@@ -4,6 +4,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { db } from "../db";
 import { bids, listings, orderItems, orders, products } from "../db/schema";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 interface CreateListingProps{
   productId: string;
@@ -162,4 +163,13 @@ export async function cancelBid(bidId: string) {
     .set({ isActive: false })
     .where(eq(bids.id, bidId));
   revalidatePath("/profile/buying");
+}
+
+export async function cancelOrder(orderId: string) {
+  await db
+    .update(orders)
+    .set({ status: "cancelled" })
+    .where(eq(orders.id, orderId));
+  revalidatePath("/profile/buying");
+  redirect("/profile/buying")
 }

@@ -1,7 +1,7 @@
 import { auth } from "@/src/auth";
 import { db } from "@/src/db";
 import { products, watchlist } from "@/src/db/schema";
-import { and, desc, eq, gt, inArray, isNull, or, sql, InferSelectModel, notInArray, is } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, or, sql, InferSelectModel, notInArray, is, isNotNull } from "drizzle-orm";
 import { EmptyState } from "../EmptyState";
 import { ProductCard } from "../ProductCard";
 import Link from "next/link";
@@ -50,6 +50,7 @@ export async function RecommendedSection() {
         .where(
           and(
             inArray(products.category, userCategories as string[]),
+            isNotNull(products.lowestAsk),
             ...(watchedProductIds.length > 0
               ? [notInArray(products.id, watchedProductIds as string[])]
               : [])

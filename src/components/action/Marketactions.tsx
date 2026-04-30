@@ -14,6 +14,7 @@ interface MarketActionProps {
   highestBid: string | null;
   price: string
   availableSizes: Set<string | null>;
+  sizePriceMap: Record<string, string>;
 }
 
 export function MarketAction({
@@ -22,7 +23,8 @@ export function MarketAction({
   lowestAsk,
   highestBid,
   price,
-  availableSizes= new Set()
+  availableSizes = new Set(),
+  sizePriceMap = {}
 }: MarketActionProps) {
   const router = useRouter()
   const [selectedSize, setSelectedSize] = useState("")
@@ -32,6 +34,17 @@ export function MarketAction({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [currentPrice, setCurrentPrice] = useState<string>(lowestAsk ?? price)
+
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size)
+    setError("")
+    if (sizePriceMap[size]) {
+      setCurrentPrice(sizePriceMap[size])
+    } else {
+      setCurrentPrice(lowestAsk ?? price)
+    }
+  }
 
   const handleBuyNow = async () => {
     if (!userId) return router.push("/login")
@@ -101,7 +114,8 @@ export function MarketAction({
             return (
               <button
               key={size}
-              onClick={() => { setSelectedSize(size); setError(""); }}
+                // onClick={() => { setSelectedSize(size); setError(""); }}
+                onClick={()=> handleSizeSelect(size)}
               disabled={!available}
               className={`py-2 text-xs font-medium rounded-lg border transition-all cursor-pointer ${
                 selectedSize === size
@@ -123,7 +137,7 @@ export function MarketAction({
           <div>
             <p className="text-xs text-gray-400 font-medium mb-0.5">Buy Now for</p>
             <p className="text-3xl font-black text-gray-900">
-              ${Number(lowestAsk ?? price).toLocaleString()}
+              ${Number(currentPrice).toLocaleString()}
             </p>
           </div>
           <div className="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-lg">

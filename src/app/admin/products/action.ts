@@ -72,14 +72,16 @@ export async function createProduct(formData: FormData) {
       const sizePrice = formData.get(`size_price_${size}`) as string;
       const askPrice = sizePrice && Number(sizePrice) > 0 ? Number(sizePrice) : Number(price);
       minAskPrice = Math.min(minAskPrice, askPrice)
-      await db.insert(listings).values({
-        productId: newProduct.id,
-        sellerId: ADMIN_SELLER_ID,
-        askPrice: String(askPrice),
-        size,
-        isActive: true,
-        expiresAt: new Date(Date.now()+365*24*60*60*1000)
-      })
+      for (let i = 0; i < 10; i++) {
+        await db.insert(listings).values({
+          productId: newProduct.id,
+          sellerId: ADMIN_SELLER_ID,
+          askPrice: String(askPrice),
+          size,
+          isActive: true,
+          expiresAt: new Date(Date.now()+365*24*60*60*1000)
+        })
+      }
     }
     await db.update(products)
       .set({ lowestAsk: String(minAskPrice) })
@@ -87,6 +89,7 @@ export async function createProduct(formData: FormData) {
   }
   revalidatePath("/admin/products");
   revalidatePath("/");
+  redirect("/admin/products")
 }
 
 export async function updateProduct(id: string, formData: FormData) {

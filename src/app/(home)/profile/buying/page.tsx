@@ -1,8 +1,8 @@
 import { auth } from "@/src/auth";
 import { db } from "@/src/db";
 import { bids, orderItems, orders, products } from "@/src/db/schema";
-import { cancelBid } from "@/src/server/market";
-import { desc, eq } from "drizzle-orm";
+import { cancelBid, cancelOrder } from "@/src/server/market";
+import { and, desc, eq, ne } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -12,7 +12,6 @@ export default async function BuyingPage() {
   if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
-  // Fetch orders with items
   const userOrders = await db
     .select({
       orderId: orders.id,
@@ -30,10 +29,9 @@ export default async function BuyingPage() {
     .from(orders)
     .leftJoin(orderItems, eq(orderItems.orderId, orders.id))
     .leftJoin(products, eq(products.id, orderItems.productId))
-    .where(eq(orders.userId, userId))
+    .where(and(eq(orders.userId, userId), ne(orders.status, "cancelled")))
     .orderBy(desc(orders.createdAt));
 
-  // Fetch active bids
   const activeBids = await db
     .select({
       id: bids.id,
@@ -96,14 +94,13 @@ export default async function BuyingPage() {
                     <Link href={href} className="text-sm font-semibold text-gray-900 line-clamp-1 no-underline hover:underline">
                       {bid.productName}
                     </Link>
-                    <p className="text-xs text-gray-400 mt-0.5">Size: {bid.size} · Bid: <span className="font-semibold text-gray-700">${Number(bid.bidPrice).toLocaleString()}</span></p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Size: {bid.size} · Bid: <span className="font-semibold text-gray-700">${Number(bid.bidPrice).toLocaleString()}</span>
+                    </p>
                     <p className="text-xs text-gray-400">Expires: {bid.expiresAt ? new Date(bid.expiresAt).toLocaleDateString() : "—"}</p>
                   </div>
                   <form action={cancelBid.bind(null, bid.id)}>
-                    <button
-                      type="submit"
-                      className="text-xs text-red-500 hover:text-red-700 font-semibold bg-transparent border-none cursor-pointer"
-                    >
+                    <button type="submit" className="text-xs text-red-500 hover:text-red-700 font-semibold bg-transparent border-none cursor-pointer">
                       Cancel
                     </button>
                   </form>
@@ -114,7 +111,6 @@ export default async function BuyingPage() {
         )}
       </section>
 
-      {/* Orders */}
       <section>
         <h2 className="text-base font-bold text-gray-900 mb-4">
           Orders{" "}
@@ -148,11 +144,25 @@ export default async function BuyingPage() {
                     <p className="text-xs text-gray-400 mt-0.5">
                       Size: {order.size} · ${Number(order.price).toLocaleString()}
                     </p>
-                    <p className="text-xs text-gray-400">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}</p>
+                    <p className="text-xs text-gray-400">
+                      {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}
+                    </p>
                   </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_COLOR[order.status ?? "pending"] ?? "bg-gray-100 text-gray-600"}`}>
-                    {order.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${STATUS_COLOR[order.status ?? "pending"] ?? "bg-gray-100 text-gray-600"}`}>
+                      {order.status}
+                    </span>
+                    {order.status === "pending" && (
+                      <form action={cancelOrder.bind(null, order.orderId)}>
+                        <button
+                          type="submit"
+                          className="text-xs text-red-500 hover:text-red-700 font-semibold bg-transparent border-none cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </div>
               );
             })}
