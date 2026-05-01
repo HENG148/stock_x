@@ -1,15 +1,38 @@
-// import { NextResponse } from "next/server";
-// import { auth } from "../lib/auth/auth";
+import { NextResponse } from "next/server";
+import { auth } from "../auth";
 
-// export default auth((req: any) => {
-//   const isLoggedIn = !!req.auth;
-//   const isAuthPage = req.nextUrl.pathname.startWith("/login");
-//   if (!isLoggedIn && !isAuthPage) {
-//     return NextResponse.redirect(new URL("/login", req.url));
-//   }
-//   return NextResponse.next();
-// });
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  const user = req.auth?.user;
+  const isLoggedIn = !!user;
+  const role = user?.role;
 
-// export const config = {
-//   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-// }
+  if (pathname.startsWith("/admin")) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    if (role !== "admin") {
+      return NextResponse.redirect(new URL("/", req.url))
+    }
+  }
+
+  if (pathname.startsWith("/profile")) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url))
+    }
+  }
+
+  if (isLoggedIn && (pathname === "login" || pathname === "/register")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+  return NextResponse.next()
+});
+
+export const config = {
+  matcher: [
+    "/admin/:path*",
+    "/profile/:path*",
+    "/login",
+    "/register"
+  ]
+}

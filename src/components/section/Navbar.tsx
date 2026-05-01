@@ -5,10 +5,23 @@ import { NavLink } from "../NavLink";
 import { BellButton } from "../ui/bellButton";
 import { AvatarMenu } from "../ui/avatarMenu";
 import CategoryBar from "../CategoryBar";
+import { db } from "@/src/db";
+import { notifications } from "@/src/db/schema";
+import { desc, eq } from "drizzle-orm";
 
 export async function Navbar() {
   const session = await auth()
   const user = session?.user;
+
+  let userNotifications: any[] = [];
+  if (user?.id) {
+    userNotifications = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, user.id))
+      .orderBy(desc(notifications.createdAt))
+      .limit(20);
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200">
@@ -30,7 +43,10 @@ export async function Navbar() {
             {user ? (
               <>
                 <div className="gap-3 flex items-center shrink-0">
-                  <BellButton />
+                  <BellButton
+                    notifications={userNotifications}
+                    userId={user.id}
+                  />
                   <AvatarMenu name={user.name} email={user.email} />
                 </div>
               </>

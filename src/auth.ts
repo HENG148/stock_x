@@ -4,10 +4,15 @@ import bcrypt from "bcryptjs";
 import { sql } from "drizzle-orm";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google"
 import { NextAuthConfig } from "next-auth";
 
-export const authConfig: NextAuthConfig ={
+export const authConfig: NextAuthConfig = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -46,14 +51,46 @@ export const authConfig: NextAuthConfig ={
     })
   ],
   session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login"
-  },
+  pages: { signIn: "/login" },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const existing = await db
+          .select()
+          .from(users)
+          .where(sql`${users.email} = ${user.email}`)
+          .limit(1)
+          .then((r) => r[0])
+        
+        if (!existing) {
+          await db.insert(users).values({
+            email: user.email!,
+            name: user.name,
+            image: user.image,
+            role: "customer",
+            emailVerified: new Date(), // Google emails are verified
+          })
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account}) {
       if (user) {
         token.id = user.id;
-        token.role = (user.role as string) ?? "customer";
+        // token.role = (user.role as string) ?? "customer";
+        token.role = (user as any).role ?? "customer";
+      }
+      if (account?.provider === "google" && token.email) {
+        const dbUser = await db
+          .select({ id: users.id, role: users.role })
+          .from(users)
+          .where(sql`${users.email} = ${token.email}`)
+          .limit(1)
+          .then(r => r[0])
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role ?? "customer"
+        }
       }
       return token;
     },
@@ -62,7 +99,6 @@ export const authConfig: NextAuthConfig ={
         session.user.id = token.id as string;
         session.user.role = token.role as string;
       }
-
       return session;
     }
   },

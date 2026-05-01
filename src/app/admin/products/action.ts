@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/src/db";
-import { listings, products } from "@/src/db/schema";
+import { listings, notifications, products, users } from "@/src/db/schema";
 import { generateSlug } from "@/src/lib/Slug";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -87,6 +87,20 @@ export async function createProduct(formData: FormData) {
       .set({ lowestAsk: String(minAskPrice) })
     .where(eq(products.id, newProduct.id))
   }
+
+  const customers = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.role, "customer"))
+  for (const customer of customers) {
+    await db.insert(notifications).values({
+      userId: customer.id,
+      type: "new_products",
+      title: "New Product Available!",
+      message: `${name} is npw available${sizes.length > 0 ? `in ${sizes.length} size` : ""}`,
+      link: `/${category?.toLowerCase()}/${slug}`
+    })
+  }
   revalidatePath("/admin/products");
   revalidatePath("/");
   redirect("/admin/products")
@@ -157,6 +171,19 @@ export async function updateProduct(id: string, formData: FormData) {
       .where(eq(products.id, id));
   }
  
+  const customers = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.role, "customer"))
+  for (const customer of customers) {
+    await db.insert(notifications).values({
+      userId: customer.id,
+      type: "discount",
+      title: "Product Updated 🎉",
+      message: `${name} has been updated with new sizes or pricing`,
+      link: `/${category?.toLowerCase()}/${slug}`,
+    });
+  }
   revalidatePath("/admin/products");
   revalidatePath("/");
   redirect("/admin/products")

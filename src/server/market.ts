@@ -5,6 +5,7 @@ import { db } from "../db";
 import { bids, listings, orderItems, orders, products } from "../db/schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { notifyAdmins } from "./notifications";
 
 interface CreateListingProps{
   productId: string;
@@ -55,7 +56,14 @@ export async function placeBid({ productId, buyerId, bidPrice, size }: PlaceBidP
     size,
     isActive: true,
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-  });
+   });
+  
+  await notifyAdmins({
+    type: "new_bid",
+    title: "New Bid Placed",
+    message: `A buyer placed a bid of $${bidPrice} for size ${size}`,
+    link: "/admin/orders"
+  })
  
   const product = await db
     .select({ highestBid: products.highestBid })
@@ -119,6 +127,12 @@ export async function buyNow({
     price: String(price),
     size,
   });
+
+  await notifyAdmins({
+    type: "new_bid",
+    title: "New Bid Placed",
+    message: `A buyer purchased size ${size}`
+  })
  
   await db
     .update(listings)

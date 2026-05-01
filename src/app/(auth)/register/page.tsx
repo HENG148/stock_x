@@ -2,98 +2,129 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { signIn } from "next-auth/react";
+import { PasswordStep } from "./PasswordStep";
+import { InfoStep } from "./Infostep";
+import { VerifyStep } from "./Verify";
+
+type Step = "info" | "verify" | "password";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [step, setStep] = useState<Step>("info");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    await signIn("google", { callbackUrl: "/" });
+  };
+
+  const startCooldown = () => {
+    setResendCooldown(60);
+    const interval = setInterval(() => {
+      setResendCooldown(prev => {
+        if (prev <= 1) { clearInterval(interval); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    const res = await fetch("/api/register/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (!res.ok) { setError(data.message || "Failed to send code"); return; }
+    setStep("verify");
+    startCooldown();
+  };
 
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    const res = await fetch("/api/register/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (!res.ok) { setError(data.message || "Invalid code"); return; }
+    setStep("password");
+  };
+
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) { setError("Passwords don't match"); return; }
+    if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
+    setLoading(true);
+    setError("");
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
     });
-
     const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || "Something went wrong");
-      setLoading(false);
-      return;
-    }
-
+    if (!res.ok) { setError(data.message || "Something went wrong"); setLoading(false); return; }
+    await signIn("credentials", { email, password, redirect: false });
     router.push("/");
+    router.refresh();
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    setLoading(true);
+    await fetch("/api/register/send-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email }),
+    });
+    setLoading(false);
+    startCooldown();
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-10 rounded-xl shadow-md w-full max-w-lg">
-        <h1 className="text-4xl font-medium text-start">Welcome to StockX</h1>
-        <h3 className="text-[17px] mt-2 mb-6">Enter your username and email to Sign Up</h3>
-        {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+        {step === "info" && (
+          <InfoStep
+            name={name} email={email}
+            loading={loading} googleLoading={googleLoading} error={error}
+            onNameChange={setName} onEmailChange={setEmail}
+            onSubmit={handleSendCode} onGoogle={handleGoogle}
+          />
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Your name"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
-          >
-            {loading ? "Creating account..." : "Register"}
-          </button>
-        </form>
-
-        <p className="text-sm text-center mt-4 text-gray-500">
-          Already have an account?{" "}
-          <a href="/login" className="text-black font-medium hover:underline">
-            Login
-          </a>
-        </p>
+        {step === "verify" && (
+          <VerifyStep
+            email={email} code={code}
+            loading={loading} error={error} resendCooldown={resendCooldown}
+            onCodeChange={setCode} onSubmit={handleVerifyCode}
+            onResend={handleResend} onBack={() => setStep("info")}
+          />
+        )}
+        {step === "password" && (
+          <PasswordStep
+            password={password} confirmPassword={confirmPassword}
+            loading={loading} error={error}
+            onPasswordChange={setPassword} onConfirmChange={setConfirmPassword}
+            onSubmit={handleSetPassword}
+          />
+        )}
       </div>
     </div>
   );
