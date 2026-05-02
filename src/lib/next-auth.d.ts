@@ -1,4 +1,5 @@
 import NextAuth, { DefaultSession} from "next-auth";
+import { auth } from "../auth";
 
 declare module "next-auth" {
   interface User{
