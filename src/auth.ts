@@ -8,6 +8,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { NextAuthConfig } from "next-auth";
 
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -88,7 +89,7 @@ export const authConfig: NextAuthConfig = {
           .limit(1)
           .then(r => r[0])
         if (dbUser) {
-          token.id = dbUser.id;
+          token.id = String(dbUser.id);
           token.role = dbUser.role ?? "customer"
         }
       }
